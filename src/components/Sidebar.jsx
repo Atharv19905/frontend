@@ -27,7 +27,7 @@ export default function Sidebar({ userName = "Faculty User", userRole = "Member"
   const handleLogout = () => {
     localStorage.removeItem("token");
     localStorage.removeItem("user");
-    window.location.replace("/login"); // better than href
+     navigate("/login"); // better than href
   };
 
   return (
