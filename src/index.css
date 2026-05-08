@@ -1,0 +1,40 @@
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+@keyframes float {
+
+  0% { transform: translateY(0px); }
+
+  50% { transform: translateY(-40px); }
+
+  100% { transform: translateY(0px); }
+
+}
+
+.animate-float {
+  animation: float 12s ease-in-out infinite;
+}
+
+.delay-2000 {
+  animation-delay: 2s;
+}
+
+.delay-4000 {
+  animation-delay: 4s;
+}
+
+:root {
+  --brand: #4f46e5;          /* main blue */
+  --brand-deep: #3730a3;     /* darker blue */
+  --brand-soft: #e0e7ff;     /* light blue background */
+
+  --surface-muted: #f3f4f6;
+
+  --border: #e5e7eb;
+  --border-soft: #f1f5f9;
+
+  --ink: #111827;
+  --ink-muted: #6b7280;
+  --ink-soft: #9ca3af;
+}
