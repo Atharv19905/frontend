@@ -1,4 +1,5 @@
 import { Link, useLocation } from "react-router-dom";
+import { useNavigate } from "react-router-dom";
 import {
   HiOutlineHome,
   HiOutlineClipboardList,
@@ -19,7 +20,7 @@ const navItems = [
   { label: "Analytics", to: "/analytics", icon: HiOutlineChartBar },
   { label: "Help & Support", to: "/help", icon: HiOutlineSupport, count: null },
 ];
-
+const navigate = useNavigate();
 export default function Sidebar({ userName = "Faculty User", userRole = "Member" }) {
   const location = useLocation();
   const pathname = location.pathname;
