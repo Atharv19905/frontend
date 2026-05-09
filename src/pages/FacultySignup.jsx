@@ -107,9 +107,9 @@ export default function FacultySignup() {
 
                 <div className="relative flex items-center gap-3">
                     <div className="h-10 w-10 rounded-xl bg-white text-[color:var(--brand)] grid place-items-center font-bold">
-                        F
+                        TNX
                     </div>
-                    <span className="font-bold text-lg">FacultyFlow</span>
+                    <span className="font-bold text-lg">TaskNexus</span>
                 </div>
 
                 <div className="relative">
@@ -122,7 +122,7 @@ export default function FacultySignup() {
                 </div>
 
                 <p className="relative text-xs text-white/60">
-                    © 2026 FacultyFlow
+                    © 2026 TaskNexus
                 </p>
             </div>
 
