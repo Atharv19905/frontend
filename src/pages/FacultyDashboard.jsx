@@ -69,53 +69,55 @@ export default function FacultyDashboard() {
 
     /* ✅ CREATE + ASSIGN (FORMDATA) */
     const createAndAssign = async (e) => {
-        e.preventDefault();
+    e.preventDefault();
 
-        try {
-            const formData = new FormData();
+    try {
+        const formData = new FormData();
 
-            formData.append("title", title);
-            formData.append("description", description);
-            formData.append("priority", priority);
-            formData.append("due_date", dueDate);
-            formData.append("visibility", visibility);
+        formData.append("title", title);
+        formData.append("description", description);
+        formData.append("priority", priority);
+        formData.append("due_date", dueDate);
+        formData.append("visibility", visibility);
 
-            if (file) {
-                formData.append("document", file); // IMPORTANT (same name as backend)
-            }
+        if (file) {
+            formData.append("document", file);
+        }
 
-            const taskRes = await API.post(`${BASE}/create`, formData, {
-                headers: {
-                    "Content-Type": "multipart/form-data",
-                },
-            });
+        const taskRes = await API.post(`${BASE}/create`, formData, {
+            headers: { "Content-Type": "multipart/form-data" },
+        });
 
-            if (selectedFaculties.length === 0) {
-                toast.error("Select at least one faculty");
-                return;
-            }
+        if (selectedFaculties.length === 0) {
+            toast.error("Select at least one faculty");
+            return;
+        }
 
-            for (const f of selectedFaculties) {
-                await API.post(`${BASE}/assign`, {
+        // ✅ FIX HERE
+        await Promise.all(
+            selectedFaculties.map((f) =>
+                API.post(`${BASE}/assign`, {
                     task_id: taskRes.data.id,
                     faculty_id: f,
-                });
-            }
+                })
+            )
+        );
 
-            toast.success("Task assigned successfully 🚀");
+        toast.success("Task assigned successfully 🚀");
 
-            setTitle("");
-            setDescription("");
-            setDueDate("");
-            setSelectedFaculties([]);
-            setOpenAssign(false);
+        setTitle("");
+        setDescription("");
+        setDueDate("");
+        setSelectedFaculties([]);
+        setOpenAssign(false);
 
-            await loadTasks();
-        } catch (err) {
-            console.error(err);
-            toast.error("Assignment failed ❌");
-        }
-    };
+        await loadTasks();
+
+    } catch (err) {
+        console.error(err);
+        toast.error("Assignment failed ❌");
+    }
+};
 
     const downloadReport = async () => {
         try {
