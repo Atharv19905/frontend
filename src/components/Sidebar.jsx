@@ -42,10 +42,10 @@ export default function Sidebar({ userName = "Faculty User", userRole = "Member"
       {/* Logo */}
       <div className="flex items-center gap-3 mb-6">
         <div className="h-10 w-10 rounded-xl bg-white text-[color:var(--brand)] grid place-items-center font-bold text-lg">
-          F
+          TX
         </div>
         <span className="font-semibold text-lg tracking-tight">
-          FacultyFlow
+          TaskNexus
         </span>
       </div>
 
