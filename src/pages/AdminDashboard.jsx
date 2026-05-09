@@ -2,7 +2,7 @@ import { useEffect, useState } from "react"
 import API from "../api"
 import NotificationBell from "../components/NotificationBell"
 import { motion } from "framer-motion"
-
+import { useNavigate } from "react-router-dom";
 import {
     BarChart,
     Bar,
@@ -15,7 +15,7 @@ import {
     Cell,
     Legend
 } from "recharts"
-
+const navigate = useNavigate();
 export default function AdminDashboard() {
 
     const [faculty, setFaculty] = useState([])
