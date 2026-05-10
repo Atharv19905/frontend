@@ -20,8 +20,8 @@ const navItems = [
   { label: "Analytics", to: "/analytics", icon: HiOutlineChartBar },
   { label: "Help & Support", to: "/help", icon: HiOutlineSupport, count: null },
 ];
-const navigate = useNavigate();
 export default function Sidebar({ userName = "Faculty User", userRole = "Member" }) {
+  const navigate = useNavigate();
   const location = useLocation();
   const pathname = location.pathname;
 
