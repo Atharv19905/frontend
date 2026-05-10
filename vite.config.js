@@ -10,5 +10,19 @@ export default defineConfig({
       'react': path.resolve('./node_modules/react'),
       'react-dom': path.resolve('./node_modules/react-dom'),
     }
+  },
+  build: {
+    minify: false,
+    sourcemap: true,
+    rollupOptions: {
+      output: {
+        manualChunks: {
+          'react-vendor': ['react', 'react-dom', 'react-router-dom'],
+          'ui-vendor': ['framer-motion', 'react-hot-toast', 'react-select', 'react-icons'],
+          'chart-vendor': ['chart.js', 'react-chartjs-2', 'recharts'],
+          'pdf-vendor': ['jspdf', 'jspdf-autotable'],
+        }
+      }
+    }
   }
 })
