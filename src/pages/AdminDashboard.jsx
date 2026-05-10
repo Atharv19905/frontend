@@ -15,8 +15,8 @@ import {
     Cell,
     Legend
 } from "recharts"
-const navigate = useNavigate();
 export default function AdminDashboard() {
+   const navigate = useNavigate();
 
     const [faculty, setFaculty] = useState([])
     const [pending, setPending] = useState([])
