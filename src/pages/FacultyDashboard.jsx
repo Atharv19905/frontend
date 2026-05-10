@@ -68,21 +68,18 @@ export default function FacultyDashboard() {
     };
 
     /* ✅ CREATE + ASSIGN (FORMDATA) */
-    const createAndAssign = async (e) => {
+  const createAndAssign = async (e) => {
     e.preventDefault();
 
     try {
         const formData = new FormData();
-
         formData.append("title", title);
         formData.append("description", description);
         formData.append("priority", priority);
         formData.append("due_date", dueDate);
         formData.append("visibility", visibility);
 
-        if (file) {
-            formData.append("document", file);
-        }
+        if (file) formData.append("document", file);
 
         const taskRes = await API.post(`${BASE}/create`, formData, {
             headers: { "Content-Type": "multipart/form-data" },
@@ -93,7 +90,6 @@ export default function FacultyDashboard() {
             return;
         }
 
-        // ✅ FIX HERE
         await Promise.all(
             selectedFaculties.map((f) =>
                 API.post(`${BASE}/assign`, {
@@ -103,15 +99,25 @@ export default function FacultyDashboard() {
             )
         );
 
+        // ✅ Show toast FIRST before any state changes
         toast.success("Task assigned successfully 🚀");
 
+        // ✅ Reset form
         setTitle("");
         setDescription("");
         setDueDate("");
+        setFile(null);
         setSelectedFaculties([]);
-        setOpenAssign(false);
+        setSelectedDepartments([]);
 
-        await loadTasks();
+        // ✅ Close modal after small delay so toast can mount
+        setTimeout(() => setOpenAssign(false), 100);
+
+        // ✅ Wait for backend to commit then fetch
+        setTimeout(async () => {
+            const r = await API.get(`${BASE}/mytasks`);
+            setTasks([...(r.data || [])]);
+        }, 500);
 
     } catch (err) {
         console.error(err);
