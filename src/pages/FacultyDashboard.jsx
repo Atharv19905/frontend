@@ -67,8 +67,7 @@ export default function FacultyDashboard() {
         } catch { }
     };
 
-    /* ✅ CREATE + ASSIGN (FORMDATA) */
-  const createAndAssign = async (e) => {
+ const createAndAssign = async (e) => {
     e.preventDefault();
 
     try {
@@ -99,10 +98,13 @@ export default function FacultyDashboard() {
             )
         );
 
-        // ✅ Show toast FIRST before any state changes
+        // ✅ FIRST: update UI (no delay)
+        await loadTasks();
+
+        // ✅ SECOND: show toast
         toast.success("Task assigned successfully 🚀");
 
-        // ✅ Reset form
+        // ✅ THIRD: reset form
         setTitle("");
         setDescription("");
         setDueDate("");
@@ -110,14 +112,8 @@ export default function FacultyDashboard() {
         setSelectedFaculties([]);
         setSelectedDepartments([]);
 
-        // ✅ Close modal after small delay so toast can mount
-        setTimeout(() => setOpenAssign(false), 100);
-
-        // ✅ Wait for backend to commit then fetch
-        setTimeout(async () => {
-            const r = await API.get(`${BASE}/mytasks`);
-            setTasks([...(r.data || [])]);
-        }, 500);
+        // ✅ LAST: close modal (small delay only here)
+        setTimeout(() => setOpenAssign(false), 300);
 
     } catch (err) {
         console.error(err);
