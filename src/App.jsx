@@ -1,10 +1,7 @@
-import { BrowserRouter, Routes, Route, Navigate } from "react-router-dom";
-
+import { Routes, Route, Navigate } from "react-router-dom";
 import HomePage from "./pages/Home"
 import Login from "./pages/Login"
 import Analytics from "./pages/Analytics";
-// import LoginAdmin from "./pages/LoginAdmin"
-// import LoginFaculty from "./pages/LoginFaculty"
 import AdminDashboard from "./pages/AdminDashboard"
 import FacultyDashboard from "./pages/FacultyDashboard"
 import { Toaster } from "react-hot-toast";
@@ -13,12 +10,11 @@ import ForgotPassword from "./pages/ForgotPassword";
 import ResetPassword from "./pages/ResetPassword";
 import AdminRequest from "./pages/AdminRequest";
 import SuperAdminDashboard from "./pages/SuperAdminDashboard";
+
 function App() {
   const user = JSON.parse(localStorage.getItem("user") || "null");
-
   return (
-
-    <BrowserRouter>
+    <>
       <Toaster
         position="top-right"
         reverseOrder={false}
@@ -45,11 +41,8 @@ function App() {
         }}
       />
       <Routes>
-
         <Route path="/" element={<HomePage />} />
         <Route path="/login" element={<Login />} />
-        {/* <Route path="/admin-login" element={<LoginAdmin />} />
-        <Route path="/faculty-login" element={<LoginFaculty />} /> */}
         <Route path="/admin-dashboard" element={<AdminDashboard />} />
         <Route path="/faculty-dashboard" element={<FacultyDashboard />} />
         <Route path="/signup" element={<FacultySignup />} />
@@ -66,11 +59,8 @@ function App() {
           }
         />
       </Routes>
-
-    </BrowserRouter>
-
+    </>
   )
-
 }
 
 export default App
