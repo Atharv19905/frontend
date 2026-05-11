@@ -4,16 +4,16 @@ import path from 'path'
 
 export default defineConfig({
   plugins: [react()],
+
   resolve: {
     dedupe: ['react', 'react-dom'],
     alias: {
-      'react': path.resolve('./node_modules/react'),
+      react: path.resolve('./node_modules/react'),
       'react-dom': path.resolve('./node_modules/react-dom'),
-    }
+    },
   },
+
   build: {
-    minify: false,
-    sourcemap: true,
     rollupOptions: {
       output: {
         manualChunks: {
@@ -21,8 +21,8 @@ export default defineConfig({
           'ui-vendor': ['framer-motion', 'react-hot-toast', 'react-select', 'react-icons'],
           'chart-vendor': ['chart.js', 'react-chartjs-2', 'recharts'],
           'pdf-vendor': ['jspdf', 'jspdf-autotable'],
-        }
-      }
-    }
-  }
+        },
+      },
+    },
+  },
 })
