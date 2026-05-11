@@ -72,8 +72,6 @@ const createAndAssign = async (e) => {
 
     try {
 
-        console.log("1 START");
-
         const formData = new FormData();
 
         formData.append("title", title);
@@ -86,17 +84,13 @@ const createAndAssign = async (e) => {
             formData.append("document", file);
         }
 
-        console.log("2 BEFORE CREATE");
-
         const taskRes = await API.post(`${BASE}/create`, formData, {
             headers: {
                 "Content-Type": "multipart/form-data",
             },
         });
 
-        console.log("3 TASK CREATED", taskRes.data);
-
-        const results = await Promise.allSettled(
+        await Promise.allSettled(
             selectedFaculties.map((f) =>
                 API.post(`${BASE}/assign`, {
                     task_id: taskRes.data.id,
@@ -105,25 +99,24 @@ const createAndAssign = async (e) => {
             )
         );
 
-        console.log("4 ASSIGN RESULTS", results);
-
-        console.log("5 BEFORE LOAD TASKS");
-
-        await loadTasks();
-
-        console.log("6 AFTER LOAD TASKS");
-
+        // ✅ Instant feedback
         toast.success("Task assigned successfully 🚀");
 
-        console.log("7 AFTER TOAST");
+        // ✅ Refresh tasks
+        await loadTasks();
 
+        // ✅ Close modal
         setOpenAssign(false);
 
-        console.log("8 AFTER MODAL CLOSE");
+        // ✅ Reset form
+        setTitle("");
+        setDescription("");
+        setDueDate("");
+        setFile(null);
+        setSelectedFaculties([]);
+        setSelectedDepartments([]);
 
     } catch (err) {
-
-        console.log("ERROR BLOCK");
 
         console.error(err);
 
