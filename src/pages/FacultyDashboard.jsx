@@ -96,7 +96,7 @@ const createAndAssign = async (e) => {
             )
         );
 
-        // ✅ Reset form first
+        // ✅ Reset form
         setTitle("");
         setDescription("");
         setDueDate("");
@@ -107,12 +107,11 @@ const createAndAssign = async (e) => {
         // ✅ Close modal
         setOpenAssign(false);
 
-        // ✅ Toast BEFORE loadTasks
-        toast.success("Task assigned successfully 🚀");
+        // ✅ Toast after re-render completes
+        setTimeout(() => toast.success("Task assigned successfully 🚀"), 50);
 
-        // ✅ Small delay then fetch
-        await new Promise(res => setTimeout(res, 300));
-        await loadTasks();
+        // ✅ Fetch updated tasks after backend commits
+        setTimeout(async () => await loadTasks(), 400);
 
     } catch (err) {
         console.error(err);
