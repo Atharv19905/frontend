@@ -69,25 +69,34 @@ export default function FacultyDashboard() {
 
 const createAndAssign = async (e) => {
     e.preventDefault();
+
     try {
+
+        console.log("1 START");
+
         const formData = new FormData();
+
         formData.append("title", title);
         formData.append("description", description);
         formData.append("priority", priority);
         formData.append("due_date", dueDate);
         formData.append("visibility", visibility);
-        if (file) formData.append("document", file);
 
-        const taskRes = await API.post(`${BASE}/create`, formData, {
-            headers: { "Content-Type": "multipart/form-data" },
-        });
-
-        if (selectedFaculties.length === 0) {
-            toast.error("Select at least one faculty");
-            return;
+        if (file) {
+            formData.append("document", file);
         }
 
-        await Promise.allSettled(
+        console.log("2 BEFORE CREATE");
+
+        const taskRes = await API.post(`${BASE}/create`, formData, {
+            headers: {
+                "Content-Type": "multipart/form-data",
+            },
+        });
+
+        console.log("3 TASK CREATED", taskRes.data);
+
+        const results = await Promise.allSettled(
             selectedFaculties.map((f) =>
                 API.post(`${BASE}/assign`, {
                     task_id: taskRes.data.id,
@@ -96,25 +105,28 @@ const createAndAssign = async (e) => {
             )
         );
 
-        // ✅ Reset form
-        setTitle("");
-        setDescription("");
-        setDueDate("");
-        setFile(null);
-        setSelectedFaculties([]);
-        setSelectedDepartments([]);
+        console.log("4 ASSIGN RESULTS", results);
 
-        // ✅ Close modal
+        console.log("5 BEFORE LOAD TASKS");
+
+        await loadTasks();
+
+        console.log("6 AFTER LOAD TASKS");
+
+        toast.success("Task assigned successfully 🚀");
+
+        console.log("7 AFTER TOAST");
+
         setOpenAssign(false);
 
-        // ✅ Toast after re-render completes
-        setTimeout(() => toast.success("Task assigned successfully 🚀"), 50);
-
-        // ✅ Fetch updated tasks after backend commits
-        setTimeout(async () => await loadTasks(), 400);
+        console.log("8 AFTER MODAL CLOSE");
 
     } catch (err) {
+
+        console.log("ERROR BLOCK");
+
         console.error(err);
+
         toast.error("Assignment failed ❌");
     }
 };
