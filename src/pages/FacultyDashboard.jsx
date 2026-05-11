@@ -94,7 +94,7 @@ const createAndAssign = async (e) => {
             return;
         }
 
-        await Promise.all(
+       await Promise.allSettled(
             selectedFaculties.map((f) =>
                 API.post(`${BASE}/assign`, {
                     task_id: taskRes.data.id,
