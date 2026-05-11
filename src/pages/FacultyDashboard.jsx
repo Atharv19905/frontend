@@ -66,22 +66,27 @@ export default function FacultyDashboard() {
             await loadTasks();
         } catch { }
     };
-
- const createAndAssign = async (e) => {
+const createAndAssign = async (e) => {
     e.preventDefault();
 
     try {
+
         const formData = new FormData();
+
         formData.append("title", title);
         formData.append("description", description);
         formData.append("priority", priority);
         formData.append("due_date", dueDate);
         formData.append("visibility", visibility);
 
-        if (file) formData.append("document", file);
+        if (file) {
+            formData.append("document", file);
+        }
 
         const taskRes = await API.post(`${BASE}/create`, formData, {
-            headers: { "Content-Type": "multipart/form-data" },
+            headers: {
+                "Content-Type": "multipart/form-data",
+            },
         });
 
         if (selectedFaculties.length === 0) {
@@ -98,13 +103,16 @@ export default function FacultyDashboard() {
             )
         );
 
-        // ✅ FIRST: update UI (no delay)
+        // ✅ Refresh tasks
         await loadTasks();
 
-        // ✅ SECOND: show toast
+        // ✅ Show success toast
         toast.success("Task assigned successfully 🚀");
 
-        // ✅ THIRD: reset form
+        // ✅ Close modal
+        setOpenAssign(false);
+
+        // ✅ Reset form
         setTitle("");
         setDescription("");
         setDueDate("");
@@ -112,11 +120,10 @@ export default function FacultyDashboard() {
         setSelectedFaculties([]);
         setSelectedDepartments([]);
 
-        // ✅ LAST: close modal (small delay only here)
-        setTimeout(() => setOpenAssign(false), 300);
-
     } catch (err) {
+
         console.error(err);
+
         toast.error("Assignment failed ❌");
     }
 };
