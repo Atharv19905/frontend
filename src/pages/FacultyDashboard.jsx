@@ -35,7 +35,7 @@ export default function FacultyDashboard() {
     const loadTasks = async () => {
         try {
             const r = await API.get(`${BASE}/mytasks`);
-            setTasks(r.data || []);
+            setTasks([...(r.data || [])]); 
         } catch (err) {
             console.error(err);
         }
@@ -66,27 +66,20 @@ export default function FacultyDashboard() {
             await loadTasks();
         } catch { }
     };
+
 const createAndAssign = async (e) => {
     e.preventDefault();
-
     try {
-
         const formData = new FormData();
-
         formData.append("title", title);
         formData.append("description", description);
         formData.append("priority", priority);
         formData.append("due_date", dueDate);
         formData.append("visibility", visibility);
-
-        if (file) {
-            formData.append("document", file);
-        }
+        if (file) formData.append("document", file);
 
         const taskRes = await API.post(`${BASE}/create`, formData, {
-            headers: {
-                "Content-Type": "multipart/form-data",
-            },
+            headers: { "Content-Type": "multipart/form-data" },
         });
 
         if (selectedFaculties.length === 0) {
@@ -94,7 +87,7 @@ const createAndAssign = async (e) => {
             return;
         }
 
-       await Promise.allSettled(
+        await Promise.allSettled(
             selectedFaculties.map((f) =>
                 API.post(`${BASE}/assign`, {
                     task_id: taskRes.data.id,
@@ -103,16 +96,7 @@ const createAndAssign = async (e) => {
             )
         );
 
-        // ✅ Refresh tasks
-        await loadTasks();
-
-        // ✅ Show success toast
-        toast.success("Task assigned successfully 🚀");
-
-        // ✅ Close modal
-        setOpenAssign(false);
-
-        // ✅ Reset form
+        // ✅ Reset form first
         setTitle("");
         setDescription("");
         setDueDate("");
@@ -120,10 +104,18 @@ const createAndAssign = async (e) => {
         setSelectedFaculties([]);
         setSelectedDepartments([]);
 
+        // ✅ Close modal
+        setOpenAssign(false);
+
+        // ✅ Toast BEFORE loadTasks
+        toast.success("Task assigned successfully 🚀");
+
+        // ✅ Small delay then fetch
+        await new Promise(res => setTimeout(res, 300));
+        await loadTasks();
+
     } catch (err) {
-
         console.error(err);
-
         toast.error("Assignment failed ❌");
     }
 };
