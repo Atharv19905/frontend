@@ -251,22 +251,25 @@ export default function TaskCard({ task, onClick, refresh }) {
             )}
 
             {isCreatedByMe && (
-              <button
-                onClick={(e) => {
-                  e.stopPropagation();
-                  setOpenModal(true);
-                }}
-                className="p-2 rounded-lg bg-blue-100 text-blue-600 hover:bg-blue-200 hover:scale-105 transition"
-              >
-                <FiRefreshCcw size={14} />
-              </button>
-         <button
+  <>
+    <button
+      onClick={(e) => {
+        e.stopPropagation();
+        setOpenModal(true);
+      }}
+      className="p-2 rounded-lg bg-blue-100 text-blue-600 hover:bg-blue-200 hover:scale-105 transition"
+    >
+      <FiRefreshCcw size={14} />
+    </button>
+
+    <button
       onClick={handleDelete}
       className="p-2 rounded-lg bg-red-100 text-red-600 hover:bg-red-200 hover:scale-105 transition"
     >
       <FiTrash2 size={14} />
     </button>
-            )}
+  </>
+)}
           </div>
         </div>
 
