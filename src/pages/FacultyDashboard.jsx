@@ -174,6 +174,14 @@ const createAndAssign = async (e) => {
         }
     })();
 
+    const currentUser = (() => {
+    try {
+        return JSON.parse(localStorage.getItem("user") || "{}");
+    } catch {
+        return {};
+    }
+})();
+    
     return (
         <AppShell userName={userName} userRole="Faculty Member">
             <PanelHeader
@@ -272,7 +280,18 @@ const createAndAssign = async (e) => {
                                 <select
                                     className="col-span-2"
                                     value={visibility}
-                                    onChange={(e) => setVisibility(e.target.value)}
+                                    onChange={(e) => {
+    const value = e.target.value;
+
+    setVisibility(value);
+
+    // ✅ Auto assign self when private
+    if (value === "private") {
+        setSelectedFaculties([currentUser.id]);
+    } else {
+        setSelectedFaculties([]);
+    }
+}}
                                 >
                                     <option value="private">Private</option>
                                     <option value="department">Department</option>
