@@ -181,6 +181,12 @@ const createAndAssign = async (e) => {
         return {};
     }
 })();
+
+useEffect(() => {
+    if (visibility === "private" && currentUser?.id) {
+        setSelectedFaculties([currentUser.id]);
+    }
+}, [visibility, currentUser?.id]);
     
     return (
         <AppShell userName={userName} userRole="Faculty Member">
