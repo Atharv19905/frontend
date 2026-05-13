@@ -243,31 +243,34 @@ export default function TaskCard({ task, onClick, refresh }) {
           <div className="flex items-center gap-2">
             {isAssignedToMe && !isCompleted && (
               <button
-                onClick={handleComplete}
-                className="p-2 rounded-lg bg-green-100 text-green-600 hover:bg-green-200 hover:scale-105 transition"
-              >
-                <FiCheck size={14} />
-              </button>
+  title="Mark Complete"
+  onClick={handleComplete}
+  className="p-2 rounded-lg bg-green-100 text-green-600 hover:bg-green-200 hover:scale-105 transition"
+>
+  <FiCheck size={14} />
+</button>
             )}
 
             {isCreatedByMe && (
   <>
     <button
-      onClick={(e) => {
-        e.stopPropagation();
-        setOpenModal(true);
-      }}
-      className="p-2 rounded-lg bg-blue-100 text-blue-600 hover:bg-blue-200 hover:scale-105 transition"
-    >
-      <FiRefreshCcw size={14} />
-    </button>
+  title="Reassign Task"
+  onClick={(e) => {
+    e.stopPropagation();
+    setOpenModal(true);
+  }}
+  className="p-2 rounded-lg bg-blue-100 text-blue-600 hover:bg-blue-200 hover:scale-105 transition"
+>
+  <FiRefreshCcw size={14} />
+</button>
 
     <button
-      onClick={handleDelete}
-      className="p-2 rounded-lg bg-red-100 text-red-600 hover:bg-red-200 hover:scale-105 transition"
-    >
-      <FiTrash2 size={14} />
-    </button>
+  title="Delete Task"
+  onClick={handleDelete}
+  className="p-2 rounded-lg bg-red-100 text-red-600 hover:bg-red-200 hover:scale-105 transition"
+>
+  <FiTrash2 size={14} />
+</button>
   </>
 )}
           </div>
