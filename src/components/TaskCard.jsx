@@ -5,6 +5,7 @@ import {
   HiOutlineCheckCircle,
 } from "react-icons/hi";
 import { FiCheck, FiRefreshCcw } from "react-icons/fi";
+import { FiTrash2 } from "react-icons/fi";
 import API from "../api";
 import toast from "react-hot-toast";
 import Select from "react-select";
@@ -134,6 +135,31 @@ export default function TaskCard({ task, onClick, refresh }) {
     }
   };
 
+  const handleDelete = async (e) => {
+  e.stopPropagation();
+
+  const confirmDelete = window.confirm(
+    "Are you sure you want to delete this task?"
+  );
+
+  if (!confirmDelete) return;
+
+  try {
+
+    await API.delete(`/api/tasks/delete/${t.id}`);
+
+    toast.success("Task deleted successfully 🗑️");
+
+    refresh?.();
+
+  } catch (err) {
+
+    console.error(err);
+
+    toast.error("Delete failed ❌");
+  }
+};
+
   /* ---------------- AVATAR SEED ---------------- */
   const seed = String(task?.id || title)
     .split("")
@@ -234,6 +260,12 @@ export default function TaskCard({ task, onClick, refresh }) {
               >
                 <FiRefreshCcw size={14} />
               </button>
+         <button
+      onClick={handleDelete}
+      className="p-2 rounded-lg bg-red-100 text-red-600 hover:bg-red-200 hover:scale-105 transition"
+    >
+      <FiTrash2 size={14} />
+    </button>
             )}
           </div>
         </div>
