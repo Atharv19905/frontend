@@ -29,13 +29,14 @@ export default function FacultyDashboard() {
     const [dueDate, setDueDate] = useState("");
     const [selectedDepartments, setSelectedDepartments] = useState([]);
     const [selectedFaculties, setSelectedFaculties] = useState([]);
+    const [selectedFacultyOptions, setSelectedFacultyOptions] = useState([]);
     const [file, setFile] = useState(null);
 
     /* ✅ Load tasks */
     const loadTasks = async () => {
         try {
             const r = await API.get(`${BASE}/mytasks`);
-            setTasks([...(r.data || [])]); 
+            setTasks([...(r.data || [])]);
         } catch (err) {
             console.error(err);
         }
@@ -43,6 +44,7 @@ export default function FacultyDashboard() {
 
     useEffect(() => {
         if (!token) return;
+
         Promise.allSettled([
             loadTasks(),
             API.get(`${BASE}/productivity`).then((r) => setStats(r.data || {})),
@@ -53,7 +55,11 @@ export default function FacultyDashboard() {
 
     const loadFaculties = async (deptArray = []) => {
         let url = `${BASE}/faculties`;
-        if (deptArray.length) url += `?department_id=${deptArray.join(",")}`;
+
+        if (deptArray.length) {
+            url += `?department_id=${deptArray.join(",")}`;
+        }
+
         try {
             const res = await API.get(url);
             setFaculties(res.data || []);
@@ -67,67 +73,70 @@ export default function FacultyDashboard() {
         } catch { }
     };
 
-const createAndAssign = async (e) => {
-    e.preventDefault();
+    const createAndAssign = async (e) => {
+        e.preventDefault();
 
-    try {
+        try {
 
-        const formData = new FormData();
+            const formData = new FormData();
 
-        formData.append("title", title);
-        formData.append("description", description);
-        formData.append("priority", priority);
-        formData.append("due_date", dueDate);
-        formData.append("visibility", visibility);
+            formData.append("title", title);
+            formData.append("description", description);
+            formData.append("priority", priority);
+            formData.append("due_date", dueDate);
+            formData.append("visibility", visibility);
 
-        if (file) {
-            formData.append("document", file);
+            if (file) {
+                formData.append("document", file);
+            }
+
+            const taskRes = await API.post(`${BASE}/create`, formData, {
+                headers: {
+                    "Content-Type": "multipart/form-data",
+                },
+            });
+
+            await Promise.allSettled(
+                selectedFaculties.map((f) =>
+                    API.post(`${BASE}/assign`, {
+                        task_id: taskRes.data.id,
+                        faculty_id: f,
+                    })
+                )
+            );
+
+            // ✅ Instant feedback
+            toast.success("Task assigned successfully 🚀");
+
+            // ✅ Refresh tasks
+            await loadTasks();
+
+            // ✅ Close modal
+            setOpenAssign(false);
+
+            // ✅ Reset form
+            setTitle("");
+            setDescription("");
+            setDueDate("");
+            setFile(null);
+            setSelectedFaculties([]);
+            setSelectedFacultyOptions([]);
+            setSelectedDepartments([]);
+
+        } catch (err) {
+
+            console.error(err);
+
+            toast.error("Assignment failed ❌");
         }
-
-        const taskRes = await API.post(`${BASE}/create`, formData, {
-            headers: {
-                "Content-Type": "multipart/form-data",
-            },
-        });
-
-        await Promise.allSettled(
-            selectedFaculties.map((f) =>
-                API.post(`${BASE}/assign`, {
-                    task_id: taskRes.data.id,
-                    faculty_id: f,
-                })
-            )
-        );
-
-        // ✅ Instant feedback
-        toast.success("Task assigned successfully 🚀");
-
-        // ✅ Refresh tasks
-        await loadTasks();
-
-        // ✅ Close modal
-        setOpenAssign(false);
-
-        // ✅ Reset form
-        setTitle("");
-        setDescription("");
-        setDueDate("");
-        setFile(null);
-        setSelectedFaculties([]);
-        setSelectedDepartments([]);
-
-    } catch (err) {
-
-        console.error(err);
-
-        toast.error("Assignment failed ❌");
-    }
-};
+    };
 
     const downloadReport = async () => {
         try {
             const res = await API.get(`${BASE}/report`);
+
             const doc = new jsPDF();
+
             doc.text("Faculty Task Report", 14, 20);
 
             const rows = (res.data || []).map((t) => [
@@ -146,6 +155,7 @@ const createAndAssign = async (e) => {
             });
 
             doc.save("report.pdf");
+
         } catch { }
     };
 
@@ -156,11 +166,13 @@ const createAndAssign = async (e) => {
             t.status === "pending" &&
             new Date(t.tasks?.due_date) >= now
         ),
+
         overdue: tasks.filter(t =>
             t.status !== "completed" &&
             t.tasks?.due_date &&
             new Date(t.tasks.due_date) < now
         ),
+
         completed: tasks.filter(t =>
             t.status === "completed"
         )
@@ -175,21 +187,32 @@ const createAndAssign = async (e) => {
     })();
 
     const currentUser = (() => {
-    try {
-        return JSON.parse(localStorage.getItem("user") || "{}");
-    } catch {
-        return {};
-    }
-})();
+        try {
+            return JSON.parse(localStorage.getItem("user") || "{}");
+        } catch {
+            return {};
+        }
+    })();
 
-useEffect(() => {
-    if (visibility === "private" && currentUser?.id) {
-        setSelectedFaculties([currentUser.id]);
-    }
-}, [visibility, currentUser?.id]);
-    
+    useEffect(() => {
+
+        if (visibility === "private" && currentUser?.id) {
+
+            setSelectedFaculties([currentUser.id]);
+
+            setSelectedFacultyOptions([
+                {
+                    value: currentUser.id,
+                    label: currentUser.name
+                }
+            ]);
+        }
+
+    }, [visibility]);
+
     return (
         <AppShell userName={userName} userRole="Faculty Member">
+
             <PanelHeader
                 title="Dashboard"
                 emoji="🗂️"
@@ -213,15 +236,22 @@ useEffect(() => {
                     ["Pending", stats.pending_tasks, "text-amber-600"],
                     ["Overdue", stats.overdue_tasks, "text-rose-600"],
                 ].map(([label, value, cls]) => (
-                    <motion.div key={label} className="bg-white rounded-2xl p-4 border shadow-card">
+                    <motion.div
+                        key={label}
+                        className="bg-white rounded-2xl p-4 border shadow-card"
+                    >
                         <p className="text-xs uppercase">{label}</p>
-                        <p className={`text-2xl font-bold ${cls}`}>{value || 0}</p>
+
+                        <p className={`text-2xl font-bold ${cls}`}>
+                            {value || 0}
+                        </p>
                     </motion.div>
                 ))}
             </div>
 
             {/* Kanban */}
             <div className="flex flex-col md:flex-row gap-4">
+
                 <KanbanColumn
                     label="In Progress"
                     variant="progress"
@@ -229,32 +259,42 @@ useEffect(() => {
                     onAdd={() => setOpenAssign(true)}
                     refresh={loadTasks}
                 />
+
                 <KanbanColumn
                     label="Overdue"
                     variant="overdue"
                     tasks={columns.overdue}
                     refresh={loadTasks}
                 />
+
                 <KanbanColumn
                     label="Completed"
                     variant="done"
                     tasks={columns.completed}
                     onCardClick={(t) => completeTask(t.id)}
                 />
+
             </div>
 
             {/* MODAL */}
             <AnimatePresence>
                 {openAssign && (
                     <motion.div className="fixed inset-0 bg-black/40 grid place-items-center z-50">
+
                         <motion.div className="bg-white rounded-3xl w-full max-w-2xl">
 
                             <div className="p-6 flex justify-between">
                                 <h2>Create & Assign Task</h2>
-                                <button onClick={() => setOpenAssign(false)}>✕</button>
+
+                                <button onClick={() => setOpenAssign(false)}>
+                                    ✕
+                                </button>
                             </div>
 
-                            <form onSubmit={createAndAssign} className="p-6 grid grid-cols-2 gap-4">
+                            <form
+                                onSubmit={createAndAssign}
+                                className="p-6 grid grid-cols-2 gap-4"
+                            >
 
                                 <input
                                     className="col-span-2 border p-3 rounded"
@@ -271,7 +311,10 @@ useEffect(() => {
                                     onChange={(e) => setDescription(e.target.value)}
                                 />
 
-                                <select value={priority} onChange={(e) => setPriority(e.target.value)}>
+                                <select
+                                    value={priority}
+                                    onChange={(e) => setPriority(e.target.value)}
+                                >
                                     <option value="low">Low</option>
                                     <option value="medium">Medium</option>
                                     <option value="high">High</option>
@@ -287,17 +330,18 @@ useEffect(() => {
                                     className="col-span-2"
                                     value={visibility}
                                     onChange={(e) => {
-    const value = e.target.value;
 
-    setVisibility(value);
+                                        const value = e.target.value;
 
-    // ✅ Auto assign self when private
-    if (value === "private") {
-        setSelectedFaculties([currentUser.id]);
-    } else {
-        setSelectedFaculties([]);
-    }
-}}
+                                        setVisibility(value);
+
+                                        if (value !== "private") {
+
+                                            setSelectedFaculties([]);
+
+                                            setSelectedFacultyOptions([]);
+                                        }
+                                    }}
                                 >
                                     <option value="private">Private</option>
                                     <option value="department">Department</option>
@@ -312,63 +356,107 @@ useEffect(() => {
 
                                 {visibility !== "private" && (
                                     <div className="col-span-2">
+
                                         <Select
                                             isMulti
                                             placeholder="Select Departments"
                                             options={[
-                                                { value: "all", label: "Select All Departments" },   // ✅ added
+                                                {
+                                                    value: "all",
+                                                    label: "Select All Departments"
+                                                },
+
                                                 ...departments.map((d) => ({
                                                     value: d.id,
                                                     label: d.name,
                                                 })),
                                             ]}
+
                                             onChange={(sel) => {
+
                                                 const values = (sel || []).map((s) => s.value);
 
                                                 if (values.includes("all")) {
+
                                                     const allIds = departments.map((d) => d.id);
+
                                                     setSelectedDepartments(allIds);
-                                                    loadFaculties(allIds); // load all faculties
+
+                                                    loadFaculties(allIds);
+
                                                 } else {
+
                                                     setSelectedDepartments(values);
+
                                                     loadFaculties(values);
                                                 }
                                             }}
                                         />
+
                                     </div>
                                 )}
 
-                                <div className="col-span-2">
-                                    <Select
-                                        isMulti
-                                        placeholder="Assign Faculties"
-                                        options={[
-                                            { value: "all", label: "Select All Faculties" },  // ✅ added
-                                            ...faculties.map((f) => ({
-                                                value: f.id,
-                                                label: f.name,
-                                            })),
-                                        ]}
-                                        onChange={(sel) => {
-                                            const values = (sel || []).map((s) => s.value);
+                                {visibility !== "private" && (
+                                    <div className="col-span-2">
 
-                                            if (values.includes("all")) {
-                                                setSelectedFaculties(faculties.map((f) => f.id));
-                                            } else {
-                                                setSelectedFaculties(values);
-                                            }
-                                        }}
-                                    />
-                                </div>
+                                        <Select
+                                            isMulti
+                                            value={selectedFacultyOptions}
+                                            placeholder="Assign Faculties"
+
+                                            options={[
+                                                {
+                                                    value: "all",
+                                                    label: "Select All Faculties"
+                                                },
+
+                                                ...faculties.map((f) => ({
+                                                    value: f.id,
+                                                    label: f.name,
+                                                })),
+                                            ]}
+
+                                            onChange={(sel) => {
+
+                                                setSelectedFacultyOptions(sel || []);
+
+                                                const values = (sel || []).map((s) => s.value);
+
+                                                if (values.includes("all")) {
+
+                                                    const allFacultyOptions = faculties.map((f) => ({
+                                                        value: f.id,
+                                                        label: f.name,
+                                                    }));
+
+                                                    setSelectedFacultyOptions(allFacultyOptions);
+
+                                                    setSelectedFaculties(
+                                                        faculties.map((f) => f.id)
+                                                    );
+
+                                                } else {
+
+                                                    setSelectedFaculties(values);
+                                                }
+                                            }}
+                                        />
+
+                                    </div>
+                                )}
 
                                 <button className="col-span-2 bg-blue-600 text-white py-2 rounded">
                                     Create & Assign
                                 </button>
+
                             </form>
+
                         </motion.div>
+
                     </motion.div>
                 )}
             </AnimatePresence>
+
         </AppShell>
     );
 }
