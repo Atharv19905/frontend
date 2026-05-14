@@ -8,10 +8,10 @@ export default function PanelHeader({ title, emoji, onShare, onAdd, onUpload, ri
       </h1>
       <div className="flex items-center gap-2">
         {right}
-        <button className="h-10 w-10 grid place-items-center rounded-full hover:bg-[color:var(--surface-muted)] text-[color:var(--ink-muted)]">
+        <button title="Search" className="h-10 w-10 grid place-items-center rounded-full hover:bg-[color:var(--surface-muted)] text-[color:var(--ink-muted)]">
           <HiOutlineSearch />
         </button>
-        <button onClick={onAdd} className="h-10 w-10 grid place-items-center rounded-full bg-[color:var(--surface-muted)] text-[color:var(--ink-muted)] hover:bg-[color:var(--brand-soft)]">
+        <button title="Assign Task" onClick={onAdd} className="h-10 w-10 grid place-items-center rounded-full bg-[color:var(--surface-muted)] text-[color:var(--ink-muted)] hover:bg-[color:var(--brand-soft)]">
           <HiPlus />
         </button>
       </div>
