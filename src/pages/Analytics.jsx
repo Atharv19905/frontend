@@ -6,6 +6,9 @@ import {
     PieChart, Pie, Cell,
     BarChart, Bar, XAxis, YAxis, Tooltip, ResponsiveContainer
 } from "recharts";
+import jsPDF from "jspdf";
+import autoTable from "jspdf-autotable";
+import { HiOutlineDownload } from "react-icons/hi";
 
 const COLORS = ["#22c55e", "#facc15", "#ef4444"];
 
@@ -31,6 +34,44 @@ export default function Analytics() {
         } catch (err) {
             console.error(err);
         }
+    };
+
+    /* ✅ DOWNLOAD DELEGATION REPORT */
+    const downloadDelegationReport = () => {
+
+        const rows = (assignedStats.tasks || []).map((t) => [
+            t.task_title,
+            new Date(t.due_date).toLocaleDateString(),
+            t.pending.join(", "),
+            t.completed.join(", "),
+            t.overdue.join(", "),
+        ]);
+
+        const doc = new jsPDF();
+
+        doc.setFontSize(18);
+        doc.text("Delegation Analytics Report", 14, 20);
+
+        autoTable(doc, {
+            startY: 30,
+            head: [[
+                "Task",
+                "Due Date",
+                "Pending",
+                "Completed",
+                "Overdue"
+            ]],
+            body: rows,
+            styles: {
+                fontSize: 9,
+                cellPadding: 3,
+            },
+            headStyles: {
+                fillColor: [59, 130, 246],
+            },
+        });
+
+        doc.save("delegation-report.pdf");
     };
 
     /* ------------------ DATA ------------------ */
@@ -198,6 +239,18 @@ export default function Analytics() {
             {/* ================= DELEGATION ================= */}
             {tab === "assigned" && (
                 <>
+
+                    {/* ✅ DOWNLOAD BUTTON */}
+                    <div className="flex justify-end mb-4">
+                        <button
+                            onClick={downloadDelegationReport}
+                            className="flex items-center gap-2 px-4 py-2 rounded-xl bg-[color:var(--brand)] text-white hover:opacity-90 transition"
+                        >
+                            <HiOutlineDownload />
+                            Download Report
+                        </button>
+                    </div>
+
                     {/* Bar Chart */}
                     <GlassCard>
                         <h2 className="mb-4 font-semibold">Team Performance</h2>
