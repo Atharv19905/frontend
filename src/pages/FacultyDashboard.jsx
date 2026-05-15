@@ -172,48 +172,50 @@ formData.append(
     /* ✅ FILTER TASKS */
     const filteredTasks = tasks.filter((t) => {
 
-        const title = t.tasks?.title?.toLowerCase() || "";
-        const description = t.tasks?.description?.toLowerCase() || "";
-        const note = t.tasks?.note?.toLowerCase() || "";
-        const tags = t.tasks?.tags || [];
-        const visibility = t.tasks?.visibility?.toLowerCase() || "";
+    const title = t.tasks?.title?.toLowerCase() || "";
+    const description = t.tasks?.description?.toLowerCase() || "";
+    const note = t.tasks?.note?.toLowerCase() || "";
+    const tags = t.tasks?.tags || [];
+    const visibility = t.tasks?.visibility?.toLowerCase() || "";
 
-        const query = searchQuery.toLowerCase().trim();
+    const query = searchQuery.toLowerCase().trim();
 
-        if (!query) return true;
+    if (!query) return true;
 
-        if (query.startsWith("#")) {
+    // TAG SEARCH
+    if (query.startsWith("#")) {
 
-            const tag = query.replace("#", "");
+        const tag = query.replace("#", "");
 
-            if (tag === "personal") {
-                return visibility === "private";
-            }
+        if (tag === "personal") {
+            return visibility === "private";
+        }
 
-            if (tag === "department") {
-                return visibility === "department";
-            }
+        if (tag === "department") {
+            return visibility === "department";
+        }
 
-            if (tag === "public") {
-                return visibility === "public";
-            }
-
-           return (
-    title.includes(tag) ||
-    description.includes(tag) ||
-    note.includes(tag) ||
-    tags.some(
-        t => t.toLowerCase() === `#${tag}`
-    )
-);
+        if (tag === "public") {
+            return visibility === "public";
+        }
 
         return (
-            title.includes(query) ||
-            description.includes(query) ||
-            note.includes(query)
+            title.includes(tag) ||
+            description.includes(tag) ||
+            note.includes(tag) ||
+            tags.some(
+                t => t.toLowerCase() === `#${tag}`
+            )
         );
-    });
+    }
 
+    // NORMAL SEARCH
+    return (
+        title.includes(query) ||
+        description.includes(query) ||
+        note.includes(query)
+    );
+});
     const now = new Date();
 
     const columns = {
