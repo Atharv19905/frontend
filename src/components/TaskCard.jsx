@@ -181,29 +181,32 @@ export default function TaskCard({ task, onClick, refresh }) {
     }
   };
 
-  /* ---------------- CARD UI ---------------- */
-
   return (
     <>
+      {/* ================= TASK CARD ================= */}
+
       <motion.div
-        whileHover={{ y: -4, scale: 1.01 }}
+        whileHover={{ y: -2 }}
         transition={{ duration: 0.2 }}
         onClick={onClick}
         className={`
-          group relative overflow-hidden rounded-3xl border border-white/40
-          bg-white/80 backdrop-blur-2xl
-          shadow-[0_8px_30px_rgb(0,0,0,0.06)]
-          hover:shadow-[0_12px_40px_rgb(0,0,0,0.12)]
+          group relative overflow-hidden rounded-2xl
+          border border-white/40
+          bg-white/75 backdrop-blur-xl
+          shadow-[0_4px_20px_rgba(0,0,0,0.05)]
+          hover:shadow-[0_8px_30px_rgba(0,0,0,0.10)]
+          hover:-translate-y-0.5
           transition-all duration-300
-          p-5 cursor-pointer
+          p-4 cursor-pointer
 
-          ${isCompleted ? "opacity-75" : ""}
+          ${isCompleted ? "opacity-70" : ""}
         `}
       >
-        {/* LEFT BORDER */}
+        {/* LEFT STATUS BAR */}
+
         <div
           className={`
-            absolute left-0 top-0 h-full w-1.5 rounded-l-3xl
+            absolute left-0 top-0 h-full w-1.5 rounded-l-2xl
 
             ${
               dueStatus === "overdue"
@@ -215,25 +218,26 @@ export default function TaskCard({ task, onClick, refresh }) {
           `}
         />
 
-        {/* TOP SECTION */}
+        {/* TOP */}
+
         <div className="flex justify-between items-start gap-3">
           <PriorityTag priority={priority} />
 
           <div className="flex flex-wrap justify-end gap-1">
             {isCreatedByMe && (
-              <span className="px-2.5 py-1 rounded-full text-[10px] font-medium bg-blue-100 text-blue-700">
+              <span className="px-2 py-0.5 rounded-md text-[10px] font-medium bg-blue-50 text-blue-600 border border-blue-100">
                 Creator
               </span>
             )}
 
             {isAssignedToMe && (
-              <span className="px-2.5 py-1 rounded-full text-[10px] font-medium bg-purple-100 text-purple-700">
+              <span className="px-2 py-0.5 rounded-md text-[10px] font-medium bg-purple-50 text-purple-600 border border-purple-100">
                 Assigned
               </span>
             )}
 
             {isCompleted && (
-              <span className="px-2.5 py-1 rounded-full text-[10px] font-medium bg-green-100 text-green-700">
+              <span className="px-2 py-0.5 rounded-md text-[10px] font-medium bg-green-50 text-green-600 border border-green-100">
                 Completed
               </span>
             )}
@@ -241,94 +245,90 @@ export default function TaskCard({ task, onClick, refresh }) {
         </div>
 
         {/* TITLE */}
-        <h3 className="mt-4 text-[17px] font-semibold text-gray-800 leading-snug group-hover:text-[color:var(--brand)] transition">
+
+        <h3 className="mt-3 text-[15px] font-semibold text-gray-800 leading-5 tracking-tight group-hover:text-[color:var(--brand)] transition">
           {title}
         </h3>
 
         {/* DESCRIPTION */}
-        <p className="mt-2 text-sm leading-relaxed text-gray-500 line-clamp-3">
+
+        <p className="mt-1.5 text-[13px] leading-5 text-gray-500 line-clamp-2">
           {description}
         </p>
 
-        {/* DUE DATE */}
-        {dueDate && (
-          <div className="mt-4 flex items-center justify-between">
+        {/* FOOTER */}
+
+        <div className="mt-4 flex items-center justify-between">
+          {dueDate && (
             <span
               className={`
-                text-xs font-medium px-3 py-1 rounded-full
+                text-[11px] font-medium px-2.5 py-1 rounded-full
 
                 ${
                   dueStatus === "overdue"
-                    ? "bg-red-100 text-red-600"
+                    ? "bg-red-50 text-red-500"
                     : dueStatus === "urgent"
-                    ? "bg-yellow-100 text-yellow-700"
+                    ? "bg-yellow-50 text-yellow-600"
                     : "bg-gray-100 text-gray-500"
                 }
               `}
             >
-              ⏳ {dueDate.toLocaleDateString()}
+              {dueDate.toLocaleDateString()}
             </span>
+          )}
+
+          <div className="flex items-center gap-1.5 ml-auto">
+            {isAssignedToMe && !isCompleted && (
+              <button
+                title="Mark Complete"
+                onClick={handleComplete}
+                className="
+                  h-8 w-8 rounded-lg
+                  bg-green-50 text-green-600
+                  hover:bg-green-100
+                  transition
+                  grid place-items-center
+                "
+              >
+                <FiCheck size={14} />
+              </button>
+            )}
+
+            {isCreatedByMe && (
+              <>
+                <button
+                  title="Reassign Task"
+                  onClick={(e) => {
+                    e.stopPropagation();
+                    setOpenModal(true);
+                  }}
+                  className="
+                    h-8 w-8 rounded-lg
+                    bg-blue-50 text-blue-600
+                    hover:bg-blue-100
+                    transition
+                    grid place-items-center
+                  "
+                >
+                  <FiRefreshCcw size={14} />
+                </button>
+
+                <button
+                  title="Delete Task"
+                  onClick={handleDelete}
+                  className="
+                    h-8 w-8 rounded-lg
+                    bg-red-50 text-red-600
+                    hover:bg-red-100
+                    transition
+                    grid place-items-center
+                  "
+                >
+                  <FiTrash2 size={14} />
+                </button>
+              </>
+            )}
           </div>
-        )}
-
-        {/* ACTIONS */}
-        <div className="mt-5 flex items-center justify-end gap-2">
-          {isAssignedToMe && !isCompleted && (
-            <button
-              title="Mark Complete"
-              onClick={handleComplete}
-              className="
-                h-10 w-10 rounded-xl
-                bg-green-100 text-green-600
-                hover:bg-green-200
-                hover:scale-105
-                active:scale-95
-                transition
-                grid place-items-center
-              "
-            >
-              <FiCheck size={16} />
-            </button>
-          )}
-
-          {isCreatedByMe && (
-            <>
-              <button
-                title="Reassign Task"
-                onClick={(e) => {
-                  e.stopPropagation();
-                  setOpenModal(true);
-                }}
-                className="
-                  h-10 w-10 rounded-xl
-                  bg-blue-100 text-blue-600
-                  hover:bg-blue-200
-                  hover:scale-105
-                  active:scale-95
-                  transition
-                  grid place-items-center
-                "
-              >
-                <FiRefreshCcw size={16} />
-              </button>
-
-              <button
-                title="Delete Task"
-                onClick={handleDelete}
-                className="
-                  h-10 w-10 rounded-xl
-                  bg-red-100 text-red-600
-                  hover:bg-red-200
-                  hover:scale-105
-                  active:scale-95
-                  transition
-                  grid place-items-center
-                "
-              >
-                <FiTrash2 size={16} />
-              </button>
-            </>
-          )}
         </div>
       </motion.div>
 
@@ -352,39 +352,42 @@ export default function TaskCard({ task, onClick, refresh }) {
             "
           >
             <motion.div
-              initial={{ scale: 0.92, opacity: 0 }}
+              initial={{ scale: 0.96, opacity: 0 }}
               animate={{ scale: 1, opacity: 1 }}
-              exit={{ scale: 0.92, opacity: 0 }}
+              exit={{ scale: 0.96, opacity: 0 }}
               transition={{ duration: 0.2 }}
               onClick={(e) => e.stopPropagation()}
               className="
                 w-full max-w-md
-                rounded-3xl
-                bg-white
-                shadow-2xl
-                border border-gray-100
+                rounded-2xl
+                bg-white/95 backdrop-blur-xl
+                border border-white/40
+                shadow-[0_20px_60px_rgba(0,0,0,0.15)]
                 overflow-hidden
               "
             >
-              {/* HEADER */}
-              <div className="px-6 py-5 border-b bg-gradient-to-r from-blue-50 to-indigo-50">
-                <h2 className="text-xl font-semibold text-gray-800">
-                  🔄 Reassign Task
+              {/* MODAL HEADER */}
+
+              <div className="px-5 py-4 border-b border-gray-100 bg-white">
+                <h2 className="text-[17px] font-semibold text-gray-800">
+                  Reassign Task
                 </h2>
 
-                <p className="text-sm text-gray-500 mt-1">
-                  Assign this task to another faculty member
+                <p className="text-xs text-gray-500 mt-1">
+                  Transfer this task to another faculty member
                 </p>
               </div>
 
-              {/* FORM */}
+              {/* MODAL BODY */}
+
               <form
                 onSubmit={handleReassignSubmit}
-                className="p-6 space-y-4"
+                className="p-5 space-y-4"
               >
                 {/* DEPARTMENT */}
+
                 <div>
-                  <label className="block text-sm font-medium text-gray-600 mb-2">
+                  <label className="block text-xs font-medium text-gray-500 mb-2">
                     Department
                   </label>
 
@@ -416,8 +419,9 @@ export default function TaskCard({ task, onClick, refresh }) {
                 </div>
 
                 {/* FACULTY */}
+
                 <div>
-                  <label className="block text-sm font-medium text-gray-600 mb-2">
+                  <label className="block text-xs font-medium text-gray-500 mb-2">
                     Faculty
                   </label>
 
@@ -440,25 +444,27 @@ export default function TaskCard({ task, onClick, refresh }) {
                 </div>
 
                 {/* REASON */}
+
                 <div>
-                  <label className="block text-sm font-medium text-gray-600 mb-2">
+                  <label className="block text-xs font-medium text-gray-500 mb-2">
                     Reason
                   </label>
 
                   <textarea
-                    placeholder="Enter reason for reassignment..."
+                    placeholder="Reason for reassignment..."
                     value={reassignReason}
                     onChange={(e) =>
                       setReassignReason(e.target.value)
                     }
                     className="
-                      w-full min-h-[100px]
-                      rounded-2xl border border-gray-200
-                      px-4 py-3
+                      w-full min-h-[90px]
+                      rounded-xl border border-gray-200
+                      px-3 py-2.5
                       text-sm
                       outline-none
-                      focus:ring-2 focus:ring-blue-200
-                      focus:border-blue-400
+                      resize-none
+                      focus:ring-2 focus:ring-blue-100
+                      focus:border-blue-300
                       transition
                     "
                     required
@@ -466,9 +472,10 @@ export default function TaskCard({ task, onClick, refresh }) {
                 </div>
 
                 {/* DUE DATE */}
+
                 <div>
-                  <label className="block text-sm font-medium text-gray-600 mb-2">
-                    New Due Date
+                  <label className="block text-xs font-medium text-gray-500 mb-2">
+                    Due Date
                   </label>
 
                   <input
@@ -476,18 +483,19 @@ export default function TaskCard({ task, onClick, refresh }) {
                     value={newDueDate}
                     onChange={(e) => setNewDueDate(e.target.value)}
                     className="
-                      w-full rounded-2xl border border-gray-200
-                      px-4 py-3 text-sm
+                      w-full rounded-xl border border-gray-200
+                      px-3 py-2.5 text-sm
                       outline-none
-                      focus:ring-2 focus:ring-blue-200
-                      focus:border-blue-400
+                      focus:ring-2 focus:ring-blue-100
+                      focus:border-blue-300
                       transition
                     "
                   />
                 </div>
 
-                {/* BUTTONS */}
-                <div className="flex justify-end gap-3 pt-2">
+                {/* ACTIONS */}
+
+                <div className="flex justify-end gap-2 pt-2">
                   <button
                     type="button"
                     onClick={() => {
@@ -495,9 +503,10 @@ export default function TaskCard({ task, onClick, refresh }) {
                       setReassignReason("");
                     }}
                     className="
-                      px-5 py-2.5 rounded-2xl
+                      px-4 py-2 rounded-xl
                       bg-gray-100 text-gray-700
                       hover:bg-gray-200
+                      text-sm
                       transition
                     "
                   >
@@ -507,15 +516,14 @@ export default function TaskCard({ task, onClick, refresh }) {
                   <button
                     type="submit"
                     className="
-                      px-5 py-2.5 rounded-2xl
+                      px-4 py-2 rounded-xl
                       bg-[color:var(--brand)]
-                      text-white
+                      text-white text-sm
                       hover:opacity-90
-                      shadow-lg shadow-blue-200/50
                       transition
                     "
                   >
-                    Reassign Task
+                    Reassign
                   </button>
                 </div>
               </form>
