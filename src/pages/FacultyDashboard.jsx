@@ -89,6 +89,12 @@ export default function FacultyDashboard() {
             formData.append("title", title);
             formData.append("description", description);
             formData.append("note", assignmentNote);
+            const extractedTags = assignmentNote.match(/#\w+/g) || [];
+
+formData.append(
+    "tags",
+    extractedTags.join(",")
+);
             formData.append("priority", priority);
             formData.append("due_date", dueDate);
             formData.append("visibility", visibility);
