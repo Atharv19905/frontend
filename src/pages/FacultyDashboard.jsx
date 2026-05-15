@@ -1,3 +1,5 @@
+
+
 import { useEffect, useState } from "react";
 import API from "../api";
 import { motion, AnimatePresence } from "framer-motion";
@@ -20,10 +22,14 @@ export default function FacultyDashboard() {
     const [departments, setDepartments] = useState([]);
     const [faculties, setFaculties] = useState([]);
 
+    // ✅ Search
+    const [searchQuery, setSearchQuery] = useState("");
+
     // Modal
     const [openAssign, setOpenAssign] = useState(false);
     const [title, setTitle] = useState("");
     const [description, setDescription] = useState("");
+    const [assignmentNote, setAssignmentNote] = useState("");
     const [priority, setPriority] = useState("medium");
     const [visibility, setVisibility] = useState("private");
     const [dueDate, setDueDate] = useState("");
@@ -82,6 +88,7 @@ export default function FacultyDashboard() {
 
             formData.append("title", title);
             formData.append("description", description);
+            formData.append("assignment_note", assignmentNote);
             formData.append("priority", priority);
             formData.append("due_date", dueDate);
             formData.append("visibility", visibility);
@@ -105,18 +112,15 @@ export default function FacultyDashboard() {
                 )
             );
 
-            // ✅ Instant feedback
             toast.success("Task assigned successfully 🚀");
 
-            // ✅ Refresh tasks
             await loadTasks();
 
-            // ✅ Close modal
             setOpenAssign(false);
 
-            // ✅ Reset form
             setTitle("");
             setDescription("");
+            setAssignmentNote("");
             setDueDate("");
             setFile(null);
             setSelectedFaculties([]);
@@ -159,21 +163,63 @@ export default function FacultyDashboard() {
         } catch { }
     };
 
+    /* ✅ FILTER TASKS */
+    const filteredTasks = tasks.filter((t) => {
+
+        const title = t.tasks?.title?.toLowerCase() || "";
+        const description = t.tasks?.description?.toLowerCase() || "";
+        const note = t.tasks?.assignment_note?.toLowerCase() || "";
+        const visibility = t.tasks?.visibility?.toLowerCase() || "";
+
+        const query = searchQuery.toLowerCase().trim();
+
+        if (!query) return true;
+
+        if (query.startsWith("#")) {
+
+            const tag = query.replace("#", "");
+
+            if (tag === "personal") {
+                return visibility === "private";
+            }
+
+            if (tag === "department") {
+                return visibility === "department";
+            }
+
+            if (tag === "public") {
+                return visibility === "public";
+            }
+
+            return (
+                title.includes(tag) ||
+                description.includes(tag) ||
+                note.includes(tag)
+            );
+        }
+
+        return (
+            title.includes(query) ||
+            description.includes(query) ||
+            note.includes(query)
+        );
+    });
+
     const now = new Date();
 
     const columns = {
-        inProgress: tasks.filter(t =>
+        inProgress: filteredTasks.filter(t =>
             t.status === "pending" &&
             new Date(t.tasks?.due_date) >= now
         ),
 
-        overdue: tasks.filter(t =>
+        overdue: filteredTasks.filter(t =>
             t.status !== "completed" &&
             t.tasks?.due_date &&
             new Date(t.tasks.due_date) < now
         ),
 
-        completed: tasks.filter(t =>
+        completed: filteredTasks.filter(t =>
             t.status === "completed"
         )
     };
@@ -218,6 +264,8 @@ export default function FacultyDashboard() {
                 emoji="🗂️"
                 onAdd={() => setOpenAssign(true)}
                 onShare={downloadReport}
+                searchQuery={searchQuery}
+                setSearchQuery={setSearchQuery}
                 right={
                     <button
                         onClick={downloadReport}
@@ -309,6 +357,13 @@ export default function FacultyDashboard() {
                                     placeholder="Description"
                                     value={description}
                                     onChange={(e) => setDescription(e.target.value)}
+                                />
+
+                                <textarea
+                                    className="col-span-2 border p-3 rounded"
+                                    placeholder="Assignment note (supports #tags like #placement #exam #personal)"
+                                    value={assignmentNote}
+                                    onChange={(e) => setAssignmentNote(e.target.value)}
                                 />
 
                                 <select
@@ -460,3 +515,4 @@ export default function FacultyDashboard() {
         </AppShell>
     );
 }
+
