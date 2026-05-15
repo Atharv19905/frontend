@@ -202,9 +202,10 @@ formData.append(
     title.includes(tag) ||
     description.includes(tag) ||
     note.includes(tag) ||
-    tags.some(t => t.toLowerCase().includes(tag))
+    tags.some(
+        t => t.toLowerCase() === `#${tag}`
+    )
 );
-        }
 
         return (
             title.includes(query) ||
