@@ -168,7 +168,8 @@ export default function FacultyDashboard() {
 
         const title = t.tasks?.title?.toLowerCase() || "";
         const description = t.tasks?.description?.toLowerCase() || "";
-        const note = t.tasks?.assignment_note?.toLowerCase() || "";
+        const note = t.tasks?.note?.toLowerCase() || "";
+        const tags = t.tasks?.tags || [];
         const visibility = t.tasks?.visibility?.toLowerCase() || "";
 
         const query = searchQuery.toLowerCase().trim();
@@ -191,11 +192,12 @@ export default function FacultyDashboard() {
                 return visibility === "public";
             }
 
-            return (
-                title.includes(tag) ||
-                description.includes(tag) ||
-                note.includes(tag)
-            );
+           return (
+    title.includes(tag) ||
+    description.includes(tag) ||
+    note.includes(tag) ||
+    tags.some(t => t.toLowerCase().includes(tag))
+);
         }
 
         return (
