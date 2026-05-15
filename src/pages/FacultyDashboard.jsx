@@ -88,7 +88,7 @@ export default function FacultyDashboard() {
 
             formData.append("title", title);
             formData.append("description", description);
-            formData.append("assignment_note", assignmentNote);
+            formData.append("note", assignmentNote);
             formData.append("priority", priority);
             formData.append("due_date", dueDate);
             formData.append("visibility", visibility);
