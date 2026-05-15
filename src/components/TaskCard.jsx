@@ -46,6 +46,7 @@ export default function TaskCard({ task, onClick, refresh }) {
   const [selectedDepartments, setSelectedDepartments] = useState([]);
   const [selectedFaculty, setSelectedFaculty] = useState(null);
   const [newDueDate, setNewDueDate] = useState("");
+  const [reassignReason, setReassignReason] = useState("");
 
   /* 🔥 LOAD DEPARTMENTS */
   useEffect(() => {
@@ -116,10 +117,11 @@ export default function TaskCard({ task, onClick, refresh }) {
 
     try {
       await API.put("/api/tasks/reassign", {
-        assignment_id: task.id,
-        new_faculty_id: selectedFaculty.value,
-        due_date: newDueDate || undefined,
-      });
+  assignment_id: task.id,
+  new_faculty_id: selectedFaculty.value,
+  due_date: newDueDate || undefined,
+  reason: reassignReason,
+});
 
       toast.success("Task reassigned successfully 🎉");
 
@@ -127,6 +129,7 @@ export default function TaskCard({ task, onClick, refresh }) {
       setSelectedFaculty(null);
       setSelectedDepartments([]);
       setNewDueDate("");
+      setReassignReason("");
 
       refresh?.();
     } catch (err) {
@@ -306,7 +309,10 @@ export default function TaskCard({ task, onClick, refresh }) {
       {openModal && (
         <div
           className="fixed inset-0 bg-black/40 backdrop-blur-sm flex items-center justify-center z-50"
-          onClick={() => setOpenModal(false)}
+         onClick={() => {
+  setOpenModal(false);
+  setReassignReason("");
+}}
         >
           <div
             onClick={(e) => e.stopPropagation()}
@@ -357,6 +363,14 @@ export default function TaskCard({ task, onClick, refresh }) {
                 }}
               />
 
+              <textarea
+  placeholder="Reason for reassignment"
+  value={reassignReason}
+  onChange={(e) => setReassignReason(e.target.value)}
+  className="w-full px-4 py-2 border rounded-xl"
+  required
+/>
+              
               {/* Due Date */}
               <input
                 type="date"
