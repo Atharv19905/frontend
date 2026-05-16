@@ -271,21 +271,21 @@ formData.append(
         <AppShell userName={userName} userRole="Faculty Member">
 
             <PanelHeader
-                title="Dashboard"
-                emoji="🗂️"
-                onAdd={() => setOpenAssign(true)}
-                onShare={downloadReport}
-                searchQuery={searchQuery}
-                setSearchQuery={setSearchQuery}
-                right={
-                    <button
-                        onClick={downloadReport}
-                        className="hidden md:inline-flex h-10 px-4 rounded-full bg-[color:var(--surface-muted)] text-sm font-medium text-[color:var(--ink-muted)] items-center gap-2"
-                    >
-                        <HiOutlineDownload /> Report
-                    </button>
-                }
-            />
+    title="Dashboard"
+    emoji="🗂️"
+    onAdd={() => setOpenAssign(true)}
+    onShare={downloadReport}
+    searchValue={searchQuery}
+    onSearchChange={setSearchQuery}
+    right={
+        <button
+            onClick={downloadReport}
+            className="hidden md:inline-flex h-10 px-4 rounded-full"
+        >
+            Report
+        </button>
+    }
+/>
 
             {/* Stats */}
             <div className="grid grid-cols-2 md:grid-cols-4 gap-3 mb-6">
