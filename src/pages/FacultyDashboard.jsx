@@ -1,5 +1,3 @@
-
-
 import { useEffect, useState } from "react";
 import API from "../api";
 import { motion, AnimatePresence } from "framer-motion";
@@ -15,7 +13,11 @@ import toast from "react-hot-toast";
 const BASE = "/api/tasks";
 
 export default function FacultyDashboard() {
-    const token = typeof window !== "undefined" ? localStorage.getItem("token") : null;
+
+    const token =
+        typeof window !== "undefined"
+            ? localStorage.getItem("token")
+            : null;
 
     const [tasks, setTasks] = useState([]);
     const [stats, setStats] = useState({});
@@ -37,34 +39,45 @@ export default function FacultyDashboard() {
     const [selectedFaculties, setSelectedFaculties] = useState([]);
     const [selectedFacultyOptions, setSelectedFacultyOptions] = useState([]);
     const [file, setFile] = useState(null);
-    const [showTutorial, setShowTutorial] = useState(false);
 
-const tutorialSeen =
-    typeof window !== "undefined" &&
-    localStorage.getItem("tutorialSeen");
+    const tutorialSeen =
+        typeof window !== "undefined" &&
+        localStorage.getItem("tutorialSeen");
 
     /* ✅ Load tasks */
     const loadTasks = async () => {
+
         try {
+
             const r = await API.get(`${BASE}/mytasks`);
+
             setTasks([...(r.data || [])]);
+
         } catch (err) {
+
             console.error(err);
         }
     };
 
     useEffect(() => {
+
         if (!token) return;
 
         Promise.allSettled([
             loadTasks(),
-            API.get(`${BASE}/productivity`).then((r) => setStats(r.data || {})),
-            API.get(`${BASE}/departments`).then((r) => setDepartments(r.data || [])),
+
+            API.get(`${BASE}/productivity`)
+                .then((r) => setStats(r.data || {})),
+
+            API.get(`${BASE}/departments`)
+                .then((r) => setDepartments(r.data || [])),
         ]);
+
         // eslint-disable-next-line
     }, []);
 
     const loadFaculties = async (deptArray = []) => {
+
         let url = `${BASE}/faculties`;
 
         if (deptArray.length) {
@@ -72,19 +85,27 @@ const tutorialSeen =
         }
 
         try {
+
             const res = await API.get(url);
+
             setFaculties(res.data || []);
+
         } catch { }
     };
 
     const completeTask = async (id) => {
+
         try {
+
             await API.put(`${BASE}/complete/${id}`, {});
+
             await loadTasks();
+
         } catch { }
     };
 
     const createAndAssign = async (e) => {
+
         e.preventDefault();
 
         try {
@@ -92,27 +113,39 @@ const tutorialSeen =
             const formData = new FormData();
 
             formData.append("title", title);
-            formData.append("description", description);
-            formData.append("note", assignmentNote);
-            const extractedTags = assignmentNote.match(/#\w+/g) || [];
 
-formData.append(
-    "tags",
-    extractedTags.join(",")
-);
+            formData.append("description", description);
+
+            formData.append("note", assignmentNote);
+
+            const extractedTags =
+                assignmentNote.match(/#\w+/g) || [];
+
+            formData.append(
+                "tags",
+                extractedTags.join(",")
+            );
+
             formData.append("priority", priority);
+
             formData.append("due_date", dueDate);
+
             formData.append("visibility", visibility);
 
             if (file) {
                 formData.append("document", file);
             }
 
-            const taskRes = await API.post(`${BASE}/create`, formData, {
-                headers: {
-                    "Content-Type": "multipart/form-data",
-                },
-            });
+            const taskRes = await API.post(
+                `${BASE}/create`,
+                formData,
+                {
+                    headers: {
+                        "Content-Type":
+                            "multipart/form-data",
+                    },
+                }
+            );
 
             await Promise.allSettled(
                 selectedFaculties.map((f) =>
@@ -123,7 +156,9 @@ formData.append(
                 )
             );
 
-            toast.success("Task assigned successfully 🚀");
+            toast.success(
+                "Task assigned successfully 🚀"
+            );
 
             await loadTasks();
 
@@ -147,7 +182,9 @@ formData.append(
     };
 
     const downloadReport = async () => {
+
         try {
+
             const res = await API.get(`${BASE}/report`);
 
             const doc = new jsPDF();
@@ -159,13 +196,22 @@ formData.append(
                 t.status || "",
                 t.tasks?.priority || "",
                 t.tasks?.due_date
-                    ? new Date(t.tasks.due_date).toLocaleDateString()
+                    ? new Date(
+                        t.tasks.due_date
+                    ).toLocaleDateString()
                     : "",
             ]);
 
             autoTable(doc, {
                 startY: 30,
-                head: [["Title", "Status", "Priority", "Due Date"]],
+                head: [
+                    [
+                        "Title",
+                        "Status",
+                        "Priority",
+                        "Due Date",
+                    ],
+                ],
                 body: rows,
             });
 
@@ -176,396 +222,602 @@ formData.append(
 
     const createDemoTasks = async () => {
 
-    try {
+        try {
 
-        const demoTasks = [
-            {
-                title: "Prepare Placement Report",
-                description: "Collect placement data for final year students",
-                note: "Important for TPO meeting #placement #report",
-                priority: "high",
-                visibility: "department",
-                due_date: "2026-05-25",
-            },
-
-            {
-                title: "Upload Exam Schedule",
-                description: "Publish semester examination timetable",
-                note: "Need approval from HOD #exam",
-                priority: "medium",
-                visibility: "public",
-                due_date: "2026-05-20",
-            },
-
-            {
-                title: "Research Paper Draft",
-                description: "Complete AI research paper",
-                note: "Personal academic work #research #personal",
-                priority: "low",
-                visibility: "private",
-                due_date: "2026-05-28",
-            },
-        ];
-
-        for (const task of demoTasks) {
-
-            const formData = new FormData();
-
-            formData.append("title", task.title);
-
-            formData.append(
-                "description",
-                task.description
-            );
-
-            formData.append("note", task.note);
-
-            const extractedTags =
-                task.note.match(/#\w+/g) || [];
-
-            formData.append(
-                "tags",
-                extractedTags.join(",")
-            );
-
-            formData.append(
-                "priority",
-                task.priority
-            );
-
-            formData.append(
-                "visibility",
-                task.visibility
-            );
-
-            formData.append(
-                "due_date",
-                task.due_date
-            );
-
-            await API.post(
-                `${BASE}/create`,
-                formData,
+            const demoTasks = [
                 {
-                    headers: {
-                        "Content-Type":
-                            "multipart/form-data",
-                    },
-                }
+                    title:
+                        "Prepare Placement Report",
+
+                    description:
+                        "Collect placement data for final year students",
+
+                    note:
+                        "Important for TPO meeting #placement #report",
+
+                    priority: "high",
+
+                    visibility: "department",
+
+                    due_date: "2026-05-25",
+                },
+
+                {
+                    title:
+                        "Upload Exam Schedule",
+
+                    description:
+                        "Publish semester examination timetable",
+
+                    note:
+                        "Need approval from HOD #exam",
+
+                    priority: "medium",
+
+                    visibility: "public",
+
+                    due_date: "2026-05-20",
+                },
+
+                {
+                    title:
+                        "Research Paper Draft",
+
+                    description:
+                        "Complete AI research paper",
+
+                    note:
+                        "Personal academic work #research #personal",
+
+                    priority: "low",
+
+                    visibility: "private",
+
+                    due_date: "2026-05-28",
+                },
+            ];
+
+            for (const task of demoTasks) {
+
+                const formData = new FormData();
+
+                formData.append(
+                    "title",
+                    task.title
+                );
+
+                formData.append(
+                    "description",
+                    task.description
+                );
+
+                formData.append(
+                    "note",
+                    task.note
+                );
+
+                const extractedTags =
+                    task.note.match(/#\w+/g) || [];
+
+                formData.append(
+                    "tags",
+                    extractedTags.join(",")
+                );
+
+                formData.append(
+                    "priority",
+                    task.priority
+                );
+
+                formData.append(
+                    "visibility",
+                    task.visibility
+                );
+
+                formData.append(
+                    "due_date",
+                    task.due_date
+                );
+
+                await API.post(
+                    `${BASE}/create`,
+                    formData,
+                    {
+                        headers: {
+                            "Content-Type":
+                                "multipart/form-data",
+                        },
+                    }
+                );
+            }
+
+            toast.success(
+                "Demo tasks added 🚀"
+            );
+
+            localStorage.setItem(
+                "tutorialSeen",
+                "true"
+            );
+
+            await loadTasks();
+
+        } catch (err) {
+
+            console.error(err);
+
+            toast.error(
+                "Failed to add demo tasks"
             );
         }
+    };
 
-        toast.success("Demo tasks added 🚀");
-
-        localStorage.setItem(
-            "tutorialSeen",
-            "true"
-        );
-
-        setShowTutorial(false);
-
-        await loadTasks();
-
-    } catch (err) {
-
-        console.error(err);
-
-        toast.error(
-            "Failed to add demo tasks"
-        );
-    }
-};
-    
     /* ✅ FILTER TASKS */
     const filteredTasks = tasks.filter((t) => {
 
-    const title = t.tasks?.title?.toLowerCase() || "";
-    const description = t.tasks?.description?.toLowerCase() || "";
-    const note = t.tasks?.note?.toLowerCase() || "";
-    const tags = t.tasks?.tags || [];
-    const visibility = t.tasks?.visibility?.toLowerCase() || "";
+        const title =
+            t.tasks?.title?.toLowerCase() || "";
 
-    const query = searchQuery.toLowerCase().trim();
+        const description =
+            t.tasks?.description?.toLowerCase() || "";
 
-    if (!query) return true;
+        const note =
+            t.tasks?.note?.toLowerCase() || "";
 
-    // TAG SEARCH
-    if (query.startsWith("#")) {
+        const tags = Array.isArray(t.tasks?.tags)
+            ? t.tasks.tags
+            : String(t.tasks?.tags || "")
+                .split(",");
 
-        const tag = query.replace("#", "");
+        const visibility =
+            t.tasks?.visibility?.toLowerCase() || "";
 
-        if (tag === "personal") {
-            return visibility === "private";
+        const query =
+            searchQuery.toLowerCase().trim();
+
+        if (!query) return true;
+
+        // TAG SEARCH
+        if (query.startsWith("#")) {
+
+            const tag =
+                query.replace("#", "");
+
+            if (tag === "personal") {
+                return visibility === "private";
+            }
+
+            if (tag === "department") {
+                return visibility === "department";
+            }
+
+            if (tag === "public") {
+                return visibility === "public";
+            }
+
+            return (
+                title.includes(tag) ||
+                description.includes(tag) ||
+                note.includes(tag) ||
+                tags.some(
+                    (t) =>
+                        t.toLowerCase() ===
+                        `#${tag}`
+                )
+            );
         }
 
-        if (tag === "department") {
-            return visibility === "department";
-        }
-
-        if (tag === "public") {
-            return visibility === "public";
-        }
-
+        // NORMAL SEARCH
         return (
-            title.includes(tag) ||
-            description.includes(tag) ||
-            note.includes(tag) ||
-            tags.some(
-                t => t.toLowerCase() === `#${tag}`
-            )
+            title.includes(query) ||
+            description.includes(query) ||
+            note.includes(query)
         );
-    }
+    });
 
-    // NORMAL SEARCH
-    return (
-        title.includes(query) ||
-        description.includes(query) ||
-        note.includes(query)
-    );
-});
     const now = new Date();
 
     const columns = {
-        inProgress: filteredTasks.filter(t =>
-            t.status === "pending" &&
-            new Date(t.tasks?.due_date) >= now
+
+        inProgress: filteredTasks.filter(
+            (t) =>
+                t.status === "pending" &&
+                new Date(
+                    t.tasks?.due_date
+                ) >= now
         ),
 
-        overdue: filteredTasks.filter(t =>
-            t.status !== "completed" &&
-            t.tasks?.due_date &&
-            new Date(t.tasks.due_date) < now
+        overdue: filteredTasks.filter(
+            (t) =>
+                t.status !== "completed" &&
+                t.tasks?.due_date &&
+                new Date(
+                    t.tasks.due_date
+                ) < now
         ),
 
-        completed: filteredTasks.filter(t =>
-            t.status === "completed"
-        )
+        completed: filteredTasks.filter(
+            (t) =>
+                t.status === "completed"
+        ),
     };
 
     const userName = (() => {
+
         try {
-            return JSON.parse(localStorage.getItem("user") || "{}")?.name || "Faculty";
+
+            return (
+                JSON.parse(
+                    localStorage.getItem("user") || "{}"
+                )?.name || "Faculty"
+            );
+
         } catch {
+
             return "Faculty";
         }
     })();
 
     const currentUser = (() => {
+
         try {
-            return JSON.parse(localStorage.getItem("user") || "{}");
+
+            return JSON.parse(
+                localStorage.getItem("user") || "{}"
+            );
+
         } catch {
+
             return {};
         }
     })();
 
     useEffect(() => {
 
-        if (visibility === "private" && currentUser?.id) {
+        if (
+            visibility === "private" &&
+            currentUser?.id
+        ) {
 
-            setSelectedFaculties([currentUser.id]);
+            setSelectedFaculties([
+                currentUser.id,
+            ]);
 
             setSelectedFacultyOptions([
                 {
                     value: currentUser.id,
-                    label: currentUser.name
-                }
+                    label: currentUser.name,
+                },
             ]);
         }
 
     }, [visibility]);
 
     return (
-        <AppShell userName={userName} userRole="Faculty Member">
+
+        <AppShell
+            userName={userName}
+            userRole="Faculty Member"
+        >
 
             <PanelHeader
-    title="Dashboard"
-    emoji="🗂️"
-    onAdd={() => setOpenAssign(true)}
-    onShare={downloadReport}
-    searchValue={searchQuery}
-    onSearchChange={setSearchQuery}
-    right={
-        <button
-            onClick={downloadReport}
-            className="hidden md:inline-flex h-10 px-4 rounded-full"
-        >
-            Report
-        </button>
-    }
-/>
+                title="Dashboard"
+                emoji="🗂️"
+                onAdd={() => setOpenAssign(true)}
+                onShare={downloadReport}
+                searchValue={searchQuery}
+                onSearchChange={setSearchQuery}
+                right={
+                    <button
+                        onClick={downloadReport}
+                        className="
+                            hidden md:inline-flex
+                            h-10
+                            px-4
+                            rounded-full
+                        "
+                    >
+                        Report
+                    </button>
+                }
+            />
 
             {/* Stats */}
-            <div className="grid grid-cols-2 md:grid-cols-4 gap-3 mb-6">
+            <div className="
+                grid
+                grid-cols-2
+                md:grid-cols-4
+                gap-3
+                mb-6
+            ">
+
                 {[
-                    ["Total", stats.total_tasks, "text-[color:var(--brand)]"],
-                    ["Completed", stats.completed_tasks, "text-emerald-600"],
-                    ["Pending", stats.pending_tasks, "text-amber-600"],
-                    ["Overdue", stats.overdue_tasks, "text-rose-600"],
+                    [
+                        "Total",
+                        stats.total_tasks,
+                        "text-[color:var(--brand)]",
+                    ],
+
+                    [
+                        "Completed",
+                        stats.completed_tasks,
+                        "text-emerald-600",
+                    ],
+
+                    [
+                        "Pending",
+                        stats.pending_tasks,
+                        "text-amber-600",
+                    ],
+
+                    [
+                        "Overdue",
+                        stats.overdue_tasks,
+                        "text-rose-600",
+                    ],
                 ].map(([label, value, cls]) => (
+
                     <motion.div
                         key={label}
-                        className="bg-white rounded-2xl p-4 border shadow-card"
+                        className="
+                            bg-white
+                            rounded-2xl
+                            p-4
+                            border
+                            shadow-card
+                        "
                     >
-                        <p className="text-xs uppercase">{label}</p>
 
-                        <p className={`text-2xl font-bold ${cls}`}>
+                        <p className="text-xs uppercase">
+                            {label}
+                        </p>
+
+                        <p className={`
+                            text-2xl
+                            font-bold
+                            ${cls}
+                        `}>
                             {value || 0}
                         </p>
+
                     </motion.div>
                 ))}
             </div>
 
+            {/* Tutorial Empty State */}
             {tasks.length === 0 && !tutorialSeen && (
 
-    <motion.div
-        initial={{ opacity: 0, y: 20 }}
-        animate={{ opacity: 1, y: 0 }}
-        className="
-            bg-white
-            rounded-3xl
-            border
-            p-10
-            mb-6
-            text-center
-            shadow-card
-        "
-    >
+                <motion.div
+                    initial={{
+                        opacity: 0,
+                        y: 20,
+                    }}
 
-        {/* Dismiss */}
-        <div className="flex justify-end">
+                    animate={{
+                        opacity: 1,
+                        y: 0,
+                    }}
 
-            <button
-                onClick={() => {
-                    localStorage.setItem(
-                        "tutorialSeen",
-                        "true"
-                    );
+                    className="
+                        bg-white
+                        rounded-3xl
+                        border
+                        p-10
+                        mb-6
+                        text-center
+                        shadow-card
+                    "
+                >
 
-                    setShowTutorial(false);
-                }}
-                className="
-                    text-sm
-                    text-gray-400
-                    hover:text-gray-600
-                "
-            >
-                Dismiss ✕
-            </button>
+                    {/* Dismiss */}
+                    <div className="flex justify-end">
 
-        </div>
+                        <button
+                            onClick={() => {
 
-        <div className="text-5xl mb-4">
-            👋
-        </div>
+                                localStorage.setItem(
+                                    "tutorialSeen",
+                                    "true"
+                                );
 
-        <h2 className="text-2xl font-bold mb-3">
-            Welcome to Faculty Dashboard
-        </h2>
+                                window.location.reload();
+                            }}
 
-        <p className="text-gray-500 max-w-2xl mx-auto mb-8">
-            Create tasks, assign work to faculties,
-            track deadlines, use smart #tags and
-            manage academic workflow efficiently.
-        </p>
+                            className="
+                                text-sm
+                                text-gray-400
+                                hover:text-gray-600
+                            "
+                        >
+                            Dismiss ✕
+                        </button>
 
-        {/* Tutorial Cards */}
-        <div className="grid md:grid-cols-3 gap-4 mb-8">
+                    </div>
 
-            <div className="border rounded-2xl p-5">
+                    <div className="text-5xl mb-4">
+                        👋
+                    </div>
 
-                <div className="text-3xl mb-2">
-                    📝
-                </div>
+                    <h2 className="
+                        text-2xl
+                        font-bold
+                        mb-3
+                    ">
+                        Welcome to Faculty Dashboard
+                    </h2>
 
-                <h3 className="font-semibold mb-2">
-                    Create Tasks
-                </h3>
+                    <p className="
+                        text-gray-500
+                        max-w-2xl
+                        mx-auto
+                        mb-8
+                    ">
+                        Create tasks, assign work to
+                        faculties, track deadlines,
+                        use smart #tags and manage
+                        academic workflow efficiently.
+                    </p>
 
-                <p className="text-sm text-gray-500">
-                    Assign academic work with
-                    priorities, due dates and
-                    attachments.
-                </p>
+                    {/* Tutorial Cards */}
+                    <div className="
+                        grid
+                        md:grid-cols-3
+                        gap-4
+                        mb-8
+                    ">
 
-            </div>
+                        <div className="
+                            border
+                            rounded-2xl
+                            p-5
+                        ">
 
-            <div className="border rounded-2xl p-5">
+                            <div className="
+                                text-3xl
+                                mb-2
+                            ">
+                                📝
+                            </div>
 
-                <div className="text-3xl mb-2">
-                    🏷️
-                </div>
+                            <h3 className="
+                                font-semibold
+                                mb-2
+                            ">
+                                Create Tasks
+                            </h3>
 
-                <h3 className="font-semibold mb-2">
-                    Smart Tag Search
-                </h3>
+                            <p className="
+                                text-sm
+                                text-gray-500
+                            ">
+                                Assign academic work
+                                with priorities,
+                                due dates and
+                                attachments.
+                            </p>
 
-                <p className="text-sm text-gray-500">
-                    Search using tags like
-                    #placement #exam #public
-                </p>
+                        </div>
 
-            </div>
+                        <div className="
+                            border
+                            rounded-2xl
+                            p-5
+                        ">
 
-            <div className="border rounded-2xl p-5">
+                            <div className="
+                                text-3xl
+                                mb-2
+                            ">
+                                🏷️
+                            </div>
 
-                <div className="text-3xl mb-2">
-                    📊
-                </div>
+                            <h3 className="
+                                font-semibold
+                                mb-2
+                            ">
+                                Smart Tag Search
+                            </h3>
 
-                <h3 className="font-semibold mb-2">
-                    Track Progress
-                </h3>
+                            <p className="
+                                text-sm
+                                text-gray-500
+                            ">
+                                Search using tags like
+                                #placement #exam
+                                #public
+                            </p>
 
-                <p className="text-sm text-gray-500">
-                    Monitor pending, overdue and
-                    completed tasks visually.
-                </p>
+                        </div>
 
-            </div>
+                        <div className="
+                            border
+                            rounded-2xl
+                            p-5
+                        ">
 
-        </div>
+                            <div className="
+                                text-3xl
+                                mb-2
+                            ">
+                                📊
+                            </div>
 
-        {/* Buttons */}
-        <div className="flex flex-wrap justify-center gap-4">
+                            <h3 className="
+                                font-semibold
+                                mb-2
+                            ">
+                                Track Progress
+                            </h3>
 
-            <button
-                onClick={createDemoTasks}
-                className="
-                    px-6 py-3 rounded-2xl
-                    bg-indigo-600
-                    text-white
-                    font-medium
-                "
-            >
-                ✨ Add Demo Tasks
-            </button>
+                            <p className="
+                                text-sm
+                                text-gray-500
+                            ">
+                                Monitor pending,
+                                overdue and completed
+                                tasks visually.
+                            </p>
 
-            <button
-                onClick={() => {
+                        </div>
 
-                    setOpenAssign(true);
+                    </div>
 
-                    localStorage.setItem(
-                        "tutorialSeen",
-                        "true"
-                    );
-                }}
-                className="
-                    px-6 py-3 rounded-2xl
-                    border
-                    font-medium
-                "
-            >
-                ➕ Create First Task
-            </button>
+                    {/* Buttons */}
+                    <div className="
+                        flex
+                        flex-wrap
+                        justify-center
+                        gap-4
+                    ">
 
-        </div>
+                        <button
+                            onClick={createDemoTasks}
+                            className="
+                                px-6
+                                py-3
+                                rounded-2xl
+                                bg-indigo-600
+                                text-white
+                                font-medium
+                            "
+                        >
+                            ✨ Add Demo Tasks
+                        </button>
 
-    </motion.div>
-)}
-            
+                        <button
+                            onClick={() => {
+
+                                setOpenAssign(true);
+
+                                localStorage.setItem(
+                                    "tutorialSeen",
+                                    "true"
+                                );
+                            }}
+
+                            className="
+                                px-6
+                                py-3
+                                rounded-2xl
+                                border
+                                font-medium
+                            "
+                        >
+                            ➕ Create First Task
+                        </button>
+
+                    </div>
+
+                </motion.div>
+            )}
+
             {/* Kanban */}
-            <div className="flex flex-col md:flex-row gap-4">
+            <div className="
+                flex
+                flex-col
+                md:flex-row
+                gap-4
+            ">
 
                 <KanbanColumn
                     label="In Progress"
@@ -586,66 +838,148 @@ formData.append(
                     label="Completed"
                     variant="done"
                     tasks={columns.completed}
-                    onCardClick={(t) => completeTask(t.id)}
+                    onCardClick={(t) =>
+                        completeTask(t.id)
+                    }
                 />
 
             </div>
 
             {/* MODAL */}
             <AnimatePresence>
+
                 {openAssign && (
-                    <motion.div className="fixed inset-0 bg-black/40 grid place-items-center z-50">
 
-                        <motion.div className="bg-white rounded-3xl w-full max-w-2xl">
+                    <motion.div className="
+                        fixed
+                        inset-0
+                        bg-black/40
+                        grid
+                        place-items-center
+                        z-50
+                    ">
 
-                            <div className="p-6 flex justify-between">
-                                <h2>Create & Assign Task</h2>
+                        <motion.div className="
+                            bg-white
+                            rounded-3xl
+                            w-full
+                            max-w-2xl
+                        ">
 
-                                <button onClick={() => setOpenAssign(false)}>
+                            <div className="
+                                p-6
+                                flex
+                                justify-between
+                            ">
+
+                                <h2>
+                                    Create & Assign Task
+                                </h2>
+
+                                <button
+                                    onClick={() =>
+                                        setOpenAssign(false)
+                                    }
+                                >
                                     ✕
                                 </button>
+
                             </div>
 
                             <form
                                 onSubmit={createAndAssign}
-                                className="p-6 grid grid-cols-2 gap-4"
+                                className="
+                                    p-6
+                                    grid
+                                    grid-cols-2
+                                    gap-4
+                                "
                             >
 
                                 <input
-                                    className="col-span-2 border p-3 rounded"
+                                    className="
+                                        col-span-2
+                                        border
+                                        p-3
+                                        rounded
+                                    "
                                     placeholder="Title"
                                     value={title}
-                                    onChange={(e) => setTitle(e.target.value)}
+                                    onChange={(e) =>
+                                        setTitle(
+                                            e.target.value
+                                        )
+                                    }
                                     required
                                 />
 
                                 <textarea
-                                    className="col-span-2 border p-3 rounded"
+                                    className="
+                                        col-span-2
+                                        border
+                                        p-3
+                                        rounded
+                                    "
                                     placeholder="Description"
                                     value={description}
-                                    onChange={(e) => setDescription(e.target.value)}
+                                    onChange={(e) =>
+                                        setDescription(
+                                            e.target.value
+                                        )
+                                    }
                                 />
 
                                 <textarea
-                                    className="col-span-2 border p-3 rounded"
-                                    placeholder="Assignment note (supports #tags like #placement #exam #personal)"
+                                    className="
+                                        col-span-2
+                                        border
+                                        p-3
+                                        rounded
+                                    "
+                                    placeholder="
+                                    Assignment note
+                                    (supports #tags like
+                                    #placement #exam
+                                    #personal)
+                                    "
                                     value={assignmentNote}
-                                    onChange={(e) => setAssignmentNote(e.target.value)}
+                                    onChange={(e) =>
+                                        setAssignmentNote(
+                                            e.target.value
+                                        )
+                                    }
                                 />
 
                                 <select
                                     value={priority}
-                                    onChange={(e) => setPriority(e.target.value)}
+                                    onChange={(e) =>
+                                        setPriority(
+                                            e.target.value
+                                        )
+                                    }
                                 >
-                                    <option value="low">Low</option>
-                                    <option value="medium">Medium</option>
-                                    <option value="high">High</option>
+                                    <option value="low">
+                                        Low
+                                    </option>
+
+                                    <option value="medium">
+                                        Medium
+                                    </option>
+
+                                    <option value="high">
+                                        High
+                                    </option>
+
                                 </select>
 
                                 <input
                                     type="date"
                                     value={dueDate}
-                                    onChange={(e) => setDueDate(e.target.value)}
+                                    onChange={(e) =>
+                                        setDueDate(
+                                            e.target.value
+                                        )
+                                    }
                                 />
 
                                 <select
@@ -653,11 +987,14 @@ formData.append(
                                     value={visibility}
                                     onChange={(e) => {
 
-                                        const value = e.target.value;
+                                        const value =
+                                            e.target.value;
 
                                         setVisibility(value);
 
-                                        if (value !== "private") {
+                                        if (
+                                            value !== "private"
+                                        ) {
 
                                             setSelectedFaculties([]);
 
@@ -665,27 +1002,46 @@ formData.append(
                                         }
                                     }}
                                 >
-                                    <option value="private">Private</option>
-                                    <option value="department">Department</option>
-                                    <option value="public">Public</option>
+
+                                    <option value="private">
+                                        Private
+                                    </option>
+
+                                    <option value="department">
+                                        Department
+                                    </option>
+
+                                    <option value="public">
+                                        Public
+                                    </option>
+
                                 </select>
 
                                 <input
                                     type="file"
                                     className="col-span-2"
-                                    onChange={(e) => setFile(e.target.files[0])}
+                                    onChange={(e) =>
+                                        setFile(
+                                            e.target.files[0]
+                                        )
+                                    }
                                 />
 
                                 {visibility !== "private" && (
+
                                     <div className="col-span-2">
 
                                         <Select
                                             isMulti
-                                            placeholder="Select Departments"
+                                            placeholder="
+                                            Select Departments
+                                            "
+
                                             options={[
                                                 {
                                                     value: "all",
-                                                    label: "Select All Departments"
+                                                    label:
+                                                        "Select All Departments",
                                                 },
 
                                                 ...departments.map((d) => ({
@@ -696,21 +1052,38 @@ formData.append(
 
                                             onChange={(sel) => {
 
-                                                const values = (sel || []).map((s) => s.value);
+                                                const values =
+                                                    (sel || [])
+                                                        .map(
+                                                            (s) => s.value
+                                                        );
 
-                                                if (values.includes("all")) {
+                                                if (
+                                                    values.includes("all")
+                                                ) {
 
-                                                    const allIds = departments.map((d) => d.id);
+                                                    const allIds =
+                                                        departments.map(
+                                                            (d) => d.id
+                                                        );
 
-                                                    setSelectedDepartments(allIds);
+                                                    setSelectedDepartments(
+                                                        allIds
+                                                    );
 
-                                                    loadFaculties(allIds);
+                                                    loadFaculties(
+                                                        allIds
+                                                    );
 
                                                 } else {
 
-                                                    setSelectedDepartments(values);
+                                                    setSelectedDepartments(
+                                                        values
+                                                    );
 
-                                                    loadFaculties(values);
+                                                    loadFaculties(
+                                                        values
+                                                    );
                                                 }
                                             }}
                                         />
@@ -719,17 +1092,26 @@ formData.append(
                                 )}
 
                                 {visibility !== "private" && (
+
                                     <div className="col-span-2">
 
                                         <Select
                                             isMulti
-                                            value={selectedFacultyOptions}
-                                            placeholder="Assign Faculties"
+
+                                            value={
+                                                selectedFacultyOptions
+                                            }
+
+                                            placeholder="
+                                            Assign Faculties
+                                            "
 
                                             options={[
                                                 {
                                                     value: "all",
-                                                    label: "Select All Faculties"
+
+                                                    label:
+                                                        "Select All Faculties",
                                                 },
 
                                                 ...faculties.map((f) => ({
@@ -740,26 +1122,41 @@ formData.append(
 
                                             onChange={(sel) => {
 
-                                                setSelectedFacultyOptions(sel || []);
+                                                setSelectedFacultyOptions(
+                                                    sel || []
+                                                );
 
-                                                const values = (sel || []).map((s) => s.value);
+                                                const values =
+                                                    (sel || [])
+                                                        .map(
+                                                            (s) => s.value
+                                                        );
 
-                                                if (values.includes("all")) {
+                                                if (
+                                                    values.includes("all")
+                                                ) {
 
-                                                    const allFacultyOptions = faculties.map((f) => ({
-                                                        value: f.id,
-                                                        label: f.name,
-                                                    }));
+                                                    const allFacultyOptions =
+                                                        faculties.map((f) => ({
+                                                            value: f.id,
+                                                            label: f.name,
+                                                        }));
 
-                                                    setSelectedFacultyOptions(allFacultyOptions);
+                                                    setSelectedFacultyOptions(
+                                                        allFacultyOptions
+                                                    );
 
                                                     setSelectedFaculties(
-                                                        faculties.map((f) => f.id)
+                                                        faculties.map(
+                                                            (f) => f.id
+                                                        )
                                                     );
 
                                                 } else {
 
-                                                    setSelectedFaculties(values);
+                                                    setSelectedFaculties(
+                                                        values
+                                                    );
                                                 }
                                             }}
                                         />
@@ -767,7 +1164,13 @@ formData.append(
                                     </div>
                                 )}
 
-                                <button className="col-span-2 bg-blue-600 text-white py-2 rounded">
+                                <button className="
+                                    col-span-2
+                                    bg-blue-600
+                                    text-white
+                                    py-2
+                                    rounded
+                                ">
                                     Create & Assign
                                 </button>
 
@@ -777,9 +1180,9 @@ formData.append(
 
                     </motion.div>
                 )}
+
             </AnimatePresence>
 
         </AppShell>
     );
 }
-
