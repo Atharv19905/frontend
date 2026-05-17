@@ -620,7 +620,7 @@ export default function FacultyDashboard() {
             </div>
 
             {/* Tutorial Empty State */}
-            {tasks.length === 0 && !tutorialSeen && (
+            {!tutorialSeen && (
 
                 <motion.div
                     initial={{
