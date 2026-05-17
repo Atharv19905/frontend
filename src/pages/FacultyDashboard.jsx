@@ -220,138 +220,148 @@ export default function FacultyDashboard() {
         } catch { }
     };
 
-    const createDemoTasks = async () => {
+   const createDemoTasks = async () => {
 
-        try {
+    try {
 
-            const demoTasks = [
+        const demoTasks = [
+            {
+                title: "Prepare Placement Report",
+
+                description:
+                    "Collect placement data for final year students",
+
+                note:
+                    "Important for TPO meeting #placement #report",
+
+                priority: "high",
+
+                visibility: "department",
+
+                due_date: "2026-05-25",
+            },
+
+            {
+                title: "Upload Exam Schedule",
+
+                description:
+                    "Publish semester examination timetable",
+
+                note:
+                    "Need approval from HOD #exam",
+
+                priority: "medium",
+
+                visibility: "public",
+
+                due_date: "2026-05-20",
+            },
+
+            {
+                title: "Research Paper Draft",
+
+                description:
+                    "Complete AI research paper",
+
+                note:
+                    "Personal academic work #research #personal",
+
+                priority: "low",
+
+                visibility: "private",
+
+                due_date: "2026-05-28",
+            },
+        ];
+
+        for (const task of demoTasks) {
+
+            const formData = new FormData();
+
+            formData.append(
+                "title",
+                task.title
+            );
+
+            formData.append(
+                "description",
+                task.description
+            );
+
+            formData.append(
+                "note",
+                task.note
+            );
+
+            const extractedTags =
+                task.note.match(/#\w+/g) || [];
+
+            formData.append(
+                "tags",
+                extractedTags.join(",")
+            );
+
+            formData.append(
+                "priority",
+                task.priority
+            );
+
+            formData.append(
+                "visibility",
+                task.visibility
+            );
+
+            formData.append(
+                "due_date",
+                task.due_date
+            );
+
+            // ✅ CREATE TASK
+            const taskRes = await API.post(
+                `${BASE}/create`,
+                formData,
                 {
-                    title:
-                        "Prepare Placement Report",
+                    headers: {
+                        "Content-Type":
+                            "multipart/form-data",
+                    },
+                }
+            );
 
-                    description:
-                        "Collect placement data for final year students",
-
-                    note:
-                        "Important for TPO meeting #placement #report",
-
-                    priority: "high",
-
-                    visibility: "department",
-
-                    due_date: "2026-05-25",
-                },
-
-                {
-                    title:
-                        "Upload Exam Schedule",
-
-                    description:
-                        "Publish semester examination timetable",
-
-                    note:
-                        "Need approval from HOD #exam",
-
-                    priority: "medium",
-
-                    visibility: "public",
-
-                    due_date: "2026-05-20",
-                },
-
-                {
-                    title:
-                        "Research Paper Draft",
-
-                    description:
-                        "Complete AI research paper",
-
-                    note:
-                        "Personal academic work #research #personal",
-
-                    priority: "low",
-
-                    visibility: "private",
-
-                    due_date: "2026-05-28",
-                },
-            ];
-
-            for (const task of demoTasks) {
-
-                const formData = new FormData();
-
-                formData.append(
-                    "title",
-                    task.title
-                );
-
-                formData.append(
-                    "description",
-                    task.description
-                );
-
-                formData.append(
-                    "note",
-                    task.note
-                );
-
-                const extractedTags =
-                    task.note.match(/#\w+/g) || [];
-
-                formData.append(
-                    "tags",
-                    extractedTags.join(",")
-                );
-
-                formData.append(
-                    "priority",
-                    task.priority
-                );
-
-                formData.append(
-                    "visibility",
-                    task.visibility
-                );
-
-                formData.append(
-                    "due_date",
-                    task.due_date
-                );
+            // ✅ ASSIGN TASK TO CURRENT USER
+            if (currentUser?.id) {
 
                 await API.post(
-                    `${BASE}/create`,
-                    formData,
+                    `${BASE}/assign`,
                     {
-                        headers: {
-                            "Content-Type":
-                                "multipart/form-data",
-                        },
+                        task_id: taskRes.data.id,
+
+                        faculty_id: currentUser.id,
                     }
                 );
             }
-
-            toast.success(
-                "Demo tasks added 🚀"
-            );
-
-            localStorage.setItem(
-                "tutorialSeen",
-                "true"
-            );
-
-            await loadTasks();
-
-        } catch (err) {
-
-            console.error(err);
-
-            toast.error(
-                "Failed to add demo tasks"
-            );
         }
-    };
 
+        toast.success(
+            "Demo tasks added 🚀"
+        );
+
+        localStorage.setItem(
+            "tutorialSeen",
+            "true"
+        );
+
+        await loadTasks();
+
+    } catch (err) {
+
+        console.error(err);
+
+        toast.error(
+            "Failed to add demo tasks"
+        );
+    }
+};
     /* ✅ FILTER TASKS */
     const filteredTasks = tasks.filter((t) => {
 
