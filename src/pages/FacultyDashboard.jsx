@@ -40,9 +40,10 @@ export default function FacultyDashboard() {
     const [selectedFacultyOptions, setSelectedFacultyOptions] = useState([]);
     const [file, setFile] = useState(null);
 
-    const tutorialSeen =
-        typeof window !== "undefined" &&
-        localStorage.getItem("tutorialSeen");
+    const [tutorialSeen, setTutorialSeen] = useState(
+    typeof window !== "undefined" &&
+    localStorage.getItem("tutorialSeen")
+);
 
     /* ✅ Load tasks */
     const loadTasks = async () => {
@@ -236,7 +237,7 @@ export default function FacultyDashboard() {
 
                 priority: "high",
 
-                visibility: "department",
+                visibility: "private",
 
                 due_date: "2026-05-25",
             },
@@ -252,7 +253,7 @@ export default function FacultyDashboard() {
 
                 priority: "medium",
 
-                visibility: "public",
+                visibility: "private",
 
                 due_date: "2026-05-20",
             },
@@ -316,7 +317,6 @@ export default function FacultyDashboard() {
                 task.due_date
             );
 
-            // ✅ CREATE TASK
             const taskRes = await API.post(
                 `${BASE}/create`,
                 formData,
@@ -328,7 +328,6 @@ export default function FacultyDashboard() {
                 }
             );
 
-            // ✅ ASSIGN TASK TO CURRENT USER
             if (currentUser?.id) {
 
                 await API.post(
@@ -350,6 +349,8 @@ export default function FacultyDashboard() {
             "tutorialSeen",
             "true"
         );
+
+        setTutorialSeen(true);
 
         await loadTasks();
 
@@ -518,18 +519,42 @@ export default function FacultyDashboard() {
                 searchValue={searchQuery}
                 onSearchChange={setSearchQuery}
                 right={
-                    <button
-                        onClick={downloadReport}
-                        className="
-                            hidden md:inline-flex
-                            h-10
-                            px-4
-                            rounded-full
-                        "
-                    >
-                        Report
-                    </button>
-                }
+    <div className="flex gap-2">
+
+        <button
+            onClick={() => {
+
+                localStorage.removeItem(
+                    "tutorialSeen"
+                );
+
+                setTutorialSeen(false);
+            }}
+            className="
+                hidden md:inline-flex
+                h-10
+                px-4
+                rounded-full
+                border
+            "
+        >
+            Tutorial
+        </button>
+
+        <button
+            onClick={downloadReport}
+            className="
+                hidden md:inline-flex
+                h-10
+                px-4
+                rounded-full
+            "
+        >
+            Report
+        </button>
+
+    </div>
+}
             />
 
             {/* Stats */}
@@ -625,13 +650,13 @@ export default function FacultyDashboard() {
                         <button
                             onClick={() => {
 
-                                localStorage.setItem(
-                                    "tutorialSeen",
-                                    "true"
-                                );
+    localStorage.setItem(
+        "tutorialSeen",
+        "true"
+    );
 
-                                window.location.reload();
-                            }}
+    setTutorialSeen(true);
+}}
 
                             className="
                                 text-sm
@@ -797,13 +822,15 @@ export default function FacultyDashboard() {
                         <button
                             onClick={() => {
 
-                                setOpenAssign(true);
+    setOpenAssign(true);
 
-                                localStorage.setItem(
-                                    "tutorialSeen",
-                                    "true"
-                                );
-                            }}
+    localStorage.setItem(
+        "tutorialSeen",
+        "true"
+    );
+
+    setTutorialSeen(true);
+}}
 
                             className="
                                 px-6
