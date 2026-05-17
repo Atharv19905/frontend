@@ -37,6 +37,11 @@ export default function FacultyDashboard() {
     const [selectedFaculties, setSelectedFaculties] = useState([]);
     const [selectedFacultyOptions, setSelectedFacultyOptions] = useState([]);
     const [file, setFile] = useState(null);
+    const [showTutorial, setShowTutorial] = useState(false);
+
+const tutorialSeen =
+    typeof window !== "undefined" &&
+    localStorage.getItem("tutorialSeen");
 
     /* ✅ Load tasks */
     const loadTasks = async () => {
@@ -169,6 +174,108 @@ formData.append(
         } catch { }
     };
 
+    const createDemoTasks = async () => {
+
+    try {
+
+        const demoTasks = [
+            {
+                title: "Prepare Placement Report",
+                description: "Collect placement data for final year students",
+                note: "Important for TPO meeting #placement #report",
+                priority: "high",
+                visibility: "department",
+                due_date: "2026-05-25",
+            },
+
+            {
+                title: "Upload Exam Schedule",
+                description: "Publish semester examination timetable",
+                note: "Need approval from HOD #exam",
+                priority: "medium",
+                visibility: "public",
+                due_date: "2026-05-20",
+            },
+
+            {
+                title: "Research Paper Draft",
+                description: "Complete AI research paper",
+                note: "Personal academic work #research #personal",
+                priority: "low",
+                visibility: "private",
+                due_date: "2026-05-28",
+            },
+        ];
+
+        for (const task of demoTasks) {
+
+            const formData = new FormData();
+
+            formData.append("title", task.title);
+
+            formData.append(
+                "description",
+                task.description
+            );
+
+            formData.append("note", task.note);
+
+            const extractedTags =
+                task.note.match(/#\w+/g) || [];
+
+            formData.append(
+                "tags",
+                extractedTags.join(",")
+            );
+
+            formData.append(
+                "priority",
+                task.priority
+            );
+
+            formData.append(
+                "visibility",
+                task.visibility
+            );
+
+            formData.append(
+                "due_date",
+                task.due_date
+            );
+
+            await API.post(
+                `${BASE}/create`,
+                formData,
+                {
+                    headers: {
+                        "Content-Type":
+                            "multipart/form-data",
+                    },
+                }
+            );
+        }
+
+        toast.success("Demo tasks added 🚀");
+
+        localStorage.setItem(
+            "tutorialSeen",
+            "true"
+        );
+
+        setShowTutorial(false);
+
+        await loadTasks();
+
+    } catch (err) {
+
+        console.error(err);
+
+        toast.error(
+            "Failed to add demo tasks"
+        );
+    }
+};
+    
     /* ✅ FILTER TASKS */
     const filteredTasks = tasks.filter((t) => {
 
@@ -308,6 +415,155 @@ formData.append(
                 ))}
             </div>
 
+            {tasks.length === 0 && !tutorialSeen && (
+
+    <motion.div
+        initial={{ opacity: 0, y: 20 }}
+        animate={{ opacity: 1, y: 0 }}
+        className="
+            bg-white
+            rounded-3xl
+            border
+            p-10
+            mb-6
+            text-center
+            shadow-card
+        "
+    >
+
+        {/* Dismiss */}
+        <div className="flex justify-end">
+
+            <button
+                onClick={() => {
+                    localStorage.setItem(
+                        "tutorialSeen",
+                        "true"
+                    );
+
+                    setShowTutorial(false);
+                }}
+                className="
+                    text-sm
+                    text-gray-400
+                    hover:text-gray-600
+                "
+            >
+                Dismiss ✕
+            </button>
+
+        </div>
+
+        <div className="text-5xl mb-4">
+            👋
+        </div>
+
+        <h2 className="text-2xl font-bold mb-3">
+            Welcome to Faculty Dashboard
+        </h2>
+
+        <p className="text-gray-500 max-w-2xl mx-auto mb-8">
+            Create tasks, assign work to faculties,
+            track deadlines, use smart #tags and
+            manage academic workflow efficiently.
+        </p>
+
+        {/* Tutorial Cards */}
+        <div className="grid md:grid-cols-3 gap-4 mb-8">
+
+            <div className="border rounded-2xl p-5">
+
+                <div className="text-3xl mb-2">
+                    📝
+                </div>
+
+                <h3 className="font-semibold mb-2">
+                    Create Tasks
+                </h3>
+
+                <p className="text-sm text-gray-500">
+                    Assign academic work with
+                    priorities, due dates and
+                    attachments.
+                </p>
+
+            </div>
+
+            <div className="border rounded-2xl p-5">
+
+                <div className="text-3xl mb-2">
+                    🏷️
+                </div>
+
+                <h3 className="font-semibold mb-2">
+                    Smart Tag Search
+                </h3>
+
+                <p className="text-sm text-gray-500">
+                    Search using tags like
+                    #placement #exam #public
+                </p>
+
+            </div>
+
+            <div className="border rounded-2xl p-5">
+
+                <div className="text-3xl mb-2">
+                    📊
+                </div>
+
+                <h3 className="font-semibold mb-2">
+                    Track Progress
+                </h3>
+
+                <p className="text-sm text-gray-500">
+                    Monitor pending, overdue and
+                    completed tasks visually.
+                </p>
+
+            </div>
+
+        </div>
+
+        {/* Buttons */}
+        <div className="flex flex-wrap justify-center gap-4">
+
+            <button
+                onClick={createDemoTasks}
+                className="
+                    px-6 py-3 rounded-2xl
+                    bg-indigo-600
+                    text-white
+                    font-medium
+                "
+            >
+                ✨ Add Demo Tasks
+            </button>
+
+            <button
+                onClick={() => {
+
+                    setOpenAssign(true);
+
+                    localStorage.setItem(
+                        "tutorialSeen",
+                        "true"
+                    );
+                }}
+                className="
+                    px-6 py-3 rounded-2xl
+                    border
+                    font-medium
+                "
+            >
+                ➕ Create First Task
+            </button>
+
+        </div>
+
+    </motion.div>
+)}
+            
             {/* Kanban */}
             <div className="flex flex-col md:flex-row gap-4">
 
