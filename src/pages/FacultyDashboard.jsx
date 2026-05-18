@@ -519,8 +519,9 @@ export default function FacultyDashboard() {
                 searchValue={searchQuery}
                 onSearchChange={setSearchQuery}
                 right={
-    <div className="flex gap-2">
+    <div className="flex items-center gap-3">
 
+        {/* Tutorial Button */}
         <button
             onClick={() => {
 
@@ -531,25 +532,50 @@ export default function FacultyDashboard() {
                 setTutorialSeen(false);
             }}
             className="
-                hidden md:inline-flex
-                h-10
-                px-4
-                rounded-full
-                border
+                hidden md:flex
+                items-center
+                gap-2
+                h-11
+                px-5
+                rounded-2xl
+                bg-gradient-to-r
+                from-indigo-600
+                to-violet-600
+                text-white
+                font-semibold
+                shadow-lg
+                hover:scale-105
+                hover:shadow-xl
+                transition-all
+                duration-300
             "
         >
-            Tutorial
+            ✨ Tutorial
         </button>
 
+        {/* Report Button */}
         <button
             onClick={downloadReport}
             className="
-                hidden md:inline-flex
-                h-10
-                px-4
-                rounded-full
+                hidden md:flex
+                items-center
+                gap-2
+                h-11
+                px-5
+                rounded-2xl
+                bg-white
+                border
+                border-gray-200
+                text-gray-700
+                font-semibold
+                shadow-sm
+                hover:shadow-md
+                hover:border-gray-300
+                transition-all
+                duration-300
             "
         >
+            <HiOutlineDownload className="text-lg" />
             Report
         </button>
 
@@ -620,233 +646,335 @@ export default function FacultyDashboard() {
             </div>
 
             {/* Tutorial Empty State */}
-            {!tutorialSeen && (
+            {/* Tutorial Section */}
+{!tutorialSeen && (
 
-                <motion.div
-                    initial={{
-                        opacity: 0,
-                        y: 20,
-                    }}
+    <motion.div
+        initial={{
+            opacity: 0,
+            y: 30,
+        }}
 
-                    animate={{
-                        opacity: 1,
-                        y: 0,
-                    }}
+        animate={{
+            opacity: 1,
+            y: 0,
+        }}
 
-                    className="
-                        bg-white
-                        rounded-3xl
+        transition={{
+            duration: 0.5,
+        }}
+
+        className="
+            relative
+            overflow-hidden
+            rounded-[32px]
+            mb-8
+            border
+            border-white/40
+            bg-gradient-to-br
+            from-slate-900
+            via-indigo-950
+            to-slate-900
+            shadow-2xl
+        "
+    >
+
+        {/* Glow Effects */}
+        <div className="
+            absolute
+            top-0
+            left-0
+            w-72
+            h-72
+            bg-indigo-500/20
+            rounded-full
+            blur-3xl
+        " />
+
+        <div className="
+            absolute
+            bottom-0
+            right-0
+            w-72
+            h-72
+            bg-violet-500/20
+            rounded-full
+            blur-3xl
+        " />
+
+        <div className="
+            relative
+            z-10
+            p-8
+            md:p-12
+        ">
+
+            {/* Top Row */}
+            <div className="
+                flex
+                flex-col
+                md:flex-row
+                md:items-center
+                md:justify-between
+                gap-6
+                mb-10
+            ">
+
+                <div>
+
+                    <div className="
+                        inline-flex
+                        items-center
+                        gap-2
+                        px-4
+                        py-2
+                        rounded-full
+                        bg-white/10
                         border
-                        p-10
-                        mb-6
-                        text-center
-                        shadow-card
-                    "
-                >
-
-                    {/* Dismiss */}
-                    <div className="flex justify-end">
-
-                        <button
-                            onClick={() => {
-
-    localStorage.setItem(
-        "tutorialSeen",
-        "true"
-    );
-
-    setTutorialSeen(true);
-}}
-
-                            className="
-                                text-sm
-                                text-gray-400
-                                hover:text-gray-600
-                            "
-                        >
-                            Dismiss ✕
-                        </button>
-
-                    </div>
-
-                    <div className="text-5xl mb-4">
-                        👋
+                        border-white/10
+                        text-indigo-200
+                        text-sm
+                        font-medium
+                        backdrop-blur
+                        mb-5
+                    ">
+                        🚀 Smart Academic Workflow System
                     </div>
 
                     <h2 className="
-                        text-2xl
-                        font-bold
-                        mb-3
+                        text-4xl
+                        md:text-5xl
+                        font-black
+                        leading-tight
+                        text-white
+                        mb-4
                     ">
-                        Welcome to Faculty Dashboard
+                        Faculty Task
+                        <span className="
+                            bg-gradient-to-r
+                            from-indigo-300
+                            to-violet-300
+                            bg-clip-text
+                            text-transparent
+                        ">
+                            {" "}Management
+                        </span>
                     </h2>
 
                     <p className="
-                        text-gray-500
-                        max-w-2xl
-                        mx-auto
-                        mb-8
+                        text-slate-300
+                        text-lg
+                        max-w-3xl
+                        leading-relaxed
                     ">
-                        Create tasks, assign work to
-                        faculties, track deadlines,
-                        use smart #tags and manage
-                        academic workflow efficiently.
+                        Streamline academic operations,
+                        assign faculty work instantly,
+                        track deadlines visually and
+                        manage departmental productivity
+                        with an enterprise-grade workflow dashboard.
                     </p>
 
-                    {/* Tutorial Cards */}
-                    <div className="
-                        grid
-                        md:grid-cols-3
-                        gap-4
-                        mb-8
-                    ">
+                </div>
+
+                {/* Dismiss */}
+                <button
+                    onClick={() => {
+
+                        localStorage.setItem(
+                            "tutorialSeen",
+                            "true"
+                        );
+
+                        setTutorialSeen(true);
+                    }}
+
+                    className="
+                        self-start
+                        px-4
+                        py-2
+                        rounded-xl
+                        bg-white/10
+                        hover:bg-white/20
+                        border
+                        border-white/10
+                        text-slate-200
+                        transition-all
+                    "
+                >
+                    ✕ Dismiss
+                </button>
+
+            </div>
+
+            {/* Feature Cards */}
+            <div className="
+                grid
+                md:grid-cols-3
+                gap-5
+                mb-10
+            ">
+
+                {[
+                    {
+                        icon: "📝",
+                        title: "Create Smart Tasks",
+                        desc:
+                            "Create academic workflows with priorities, due dates, attachments and intelligent faculty assignments.",
+                    },
+
+                    {
+                        icon: "🏷️",
+                        title: "Advanced Tag Search",
+                        desc:
+                            "Search instantly using smart filters like #placement #exam #research #personal.",
+                    },
+
+                    {
+                        icon: "📊",
+                        title: "Track Productivity",
+                        desc:
+                            "Monitor overdue, pending and completed work using visual kanban-based task tracking.",
+                    },
+                ].map((item) => (
+
+                    <motion.div
+                        whileHover={{
+                            y: -6,
+                        }}
+
+                        key={item.title}
+
+                        className="
+                            group
+                            relative
+                            overflow-hidden
+                            rounded-3xl
+                            border
+                            border-white/10
+                            bg-white/5
+                            backdrop-blur-xl
+                            p-6
+                            transition-all
+                            duration-300
+                        "
+                    >
 
                         <div className="
-                            border
-                            rounded-2xl
-                            p-5
-                        ">
+                            absolute
+                            inset-0
+                            bg-gradient-to-br
+                            from-indigo-500/10
+                            to-violet-500/10
+                            opacity-0
+                            group-hover:opacity-100
+                            transition
+                        " />
+
+                        <div className="relative z-10">
 
                             <div className="
-                                text-3xl
-                                mb-2
-                            ">
-                                📝
-                            </div>
-
-                            <h3 className="
-                                font-semibold
-                                mb-2
-                            ">
-                                Create Tasks
-                            </h3>
-
-                            <p className="
-                                text-sm
-                                text-gray-500
-                            ">
-                                Assign academic work
-                                with priorities,
-                                due dates and
-                                attachments.
-                            </p>
-
-                        </div>
-
-                        <div className="
-                            border
-                            rounded-2xl
-                            p-5
-                        ">
-
-                            <div className="
-                                text-3xl
-                                mb-2
-                            ">
-                                🏷️
-                            </div>
-
-                            <h3 className="
-                                font-semibold
-                                mb-2
-                            ">
-                                Smart Tag Search
-                            </h3>
-
-                            <p className="
-                                text-sm
-                                text-gray-500
-                            ">
-                                Search using tags like
-                                #placement #exam
-                                #public
-                            </p>
-
-                        </div>
-
-                        <div className="
-                            border
-                            rounded-2xl
-                            p-5
-                        ">
-
-                            <div className="
-                                text-3xl
-                                mb-2
-                            ">
-                                📊
-                            </div>
-
-                            <h3 className="
-                                font-semibold
-                                mb-2
-                            ">
-                                Track Progress
-                            </h3>
-
-                            <p className="
-                                text-sm
-                                text-gray-500
-                            ">
-                                Monitor pending,
-                                overdue and completed
-                                tasks visually.
-                            </p>
-
-                        </div>
-
-                    </div>
-
-                    {/* Buttons */}
-                    <div className="
-                        flex
-                        flex-wrap
-                        justify-center
-                        gap-4
-                    ">
-
-                        <button
-                            onClick={createDemoTasks}
-                            className="
-                                px-6
-                                py-3
+                                w-16
+                                h-16
                                 rounded-2xl
-                                bg-indigo-600
+                                bg-white/10
+                                flex
+                                items-center
+                                justify-center
+                                text-3xl
+                                mb-5
+                            ">
+                                {item.icon}
+                            </div>
+
+                            <h3 className="
+                                text-xl
+                                font-bold
                                 text-white
-                                font-medium
-                            "
-                        >
-                            ✨ Add Demo Tasks
-                        </button>
+                                mb-3
+                            ">
+                                {item.title}
+                            </h3>
 
-                        <button
-                            onClick={() => {
+                            <p className="
+                                text-slate-300
+                                leading-relaxed
+                            ">
+                                {item.desc}
+                            </p>
 
-    setOpenAssign(true);
+                        </div>
 
-    localStorage.setItem(
-        "tutorialSeen",
-        "true"
-    );
+                    </motion.div>
+                ))}
 
-    setTutorialSeen(true);
-}}
+            </div>
 
-                            className="
-                                px-6
-                                py-3
-                                rounded-2xl
-                                border
-                                font-medium
-                            "
-                        >
-                            ➕ Create First Task
-                        </button>
+            {/* Bottom CTA */}
+            <div className="
+                flex
+                flex-wrap
+                items-center
+                justify-center
+                gap-4
+            ">
 
-                    </div>
+                <button
+                    onClick={createDemoTasks}
+                    className="
+                        px-8
+                        py-4
+                        rounded-2xl
+                        bg-gradient-to-r
+                        from-indigo-500
+                        to-violet-600
+                        text-white
+                        font-bold
+                        shadow-2xl
+                        hover:scale-105
+                        transition-all
+                        duration-300
+                    "
+                >
+                    ✨ Add Demo Tasks
+                </button>
 
-                </motion.div>
-            )}
+                <button
+                    onClick={() => {
+
+                        setOpenAssign(true);
+
+                        localStorage.setItem(
+                            "tutorialSeen",
+                            "true"
+                        );
+
+                        setTutorialSeen(true);
+                    }}
+
+                    className="
+                        px-8
+                        py-4
+                        rounded-2xl
+                        border
+                        border-white/20
+                        bg-white/10
+                        backdrop-blur-xl
+                        text-white
+                        font-semibold
+                        hover:bg-white/20
+                        transition-all
+                        duration-300
+                    "
+                >
+                    ➕ Create First Task
+                </button>
+
+            </div>
+
+        </div>
+
+    </motion.div>
+)}
 
             {/* Kanban */}
             <div className="
