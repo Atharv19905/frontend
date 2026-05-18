@@ -757,7 +757,7 @@ export default function FacultyDashboard() {
                             bg-clip-text
                             text-transparent
                         ">
-                            {" "}Nexus
+                            Nexus
                         </span>
                     </h2>
 
