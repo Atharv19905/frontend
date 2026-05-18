@@ -383,7 +383,7 @@ export default function HomePage() {
                             <span className="text-[10px] font-black">FF</span>
                         </div>
                         <p className="text-sm font-bold tracking-widest uppercase">
-                            © 2026 FacultyFlow Inc.
+                            © 2026 TaskNexus Inc.
                         </p>
                     </div>
                 </div>
