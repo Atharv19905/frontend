@@ -749,7 +749,7 @@ export default function FacultyDashboard() {
                         text-white
                         mb-4
                     ">
-                        Faculty Task
+                        Task
                         <span className="
                             bg-gradient-to-r
                             from-indigo-300
@@ -757,7 +757,7 @@ export default function FacultyDashboard() {
                             bg-clip-text
                             text-transparent
                         ">
-                            {" "}Management
+                            {" "}Nexus
                         </span>
                     </h2>
 
