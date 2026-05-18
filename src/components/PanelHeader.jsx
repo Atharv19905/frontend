@@ -198,35 +198,38 @@ export default function PanelHeader({
           </div>
 
           {/* Search Tags */}
-          <div className="hidden xl:flex items-center gap-2 mt-2 px-1">
+          {/* Search Tags */}
+<div className="flex flex-wrap items-center gap-2 mt-2 px-1">
 
-            {["#placement", "#exam", "#personal"].map(
-              (tag) => (
-                <button
-                  key={tag}
-                  onClick={() =>
-                    onSearchChange?.(tag)
-                  }
-                  className="
-                    text-xs
-                    px-3
-                    py-1
-                    rounded-full
-                    bg-white
-                    border
-                    border-slate-200
-                    text-slate-500
-                    hover:border-indigo-200
-                    hover:text-indigo-600
-                    hover:bg-indigo-50
-                    transition-all
-                  "
-                >
-                  {tag}
-                </button>
-              )
-            )}
-          </div>
+  {["#placement", "#exam", "#personal"].map(
+    (tag) => (
+      <button
+        type="button"
+        key={tag}
+        onClick={() => {
+          onSearchChange(tag);
+        }}
+        className="
+          text-xs
+          px-3
+          py-1
+          rounded-full
+          bg-white
+          border
+          border-slate-200
+          text-slate-500
+          hover:border-indigo-200
+          hover:text-indigo-600
+          hover:bg-indigo-50
+          transition-all
+          cursor-pointer
+        "
+      >
+        {tag}
+      </button>
+    )
+  )}
+</div>
         </div>
 
         {/* CUSTOM RIGHT */}
