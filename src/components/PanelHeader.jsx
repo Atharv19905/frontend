@@ -207,7 +207,7 @@ export default function PanelHeader({
         type="button"
         key={tag}
         onClick={() => {
-          onSearchChange(tag);
+          onSearchChange?.(tag);
         }}
         className="
           text-xs
